@@ -92,6 +92,7 @@ def build_engine(database_url: str):
         kwargs["connect_args"] = {"check_same_thread": False}
     else:
         kwargs["pool_pre_ping"] = True
+        kwargs["pool_recycle"] = 300
     return create_engine(url, **kwargs)
 
 

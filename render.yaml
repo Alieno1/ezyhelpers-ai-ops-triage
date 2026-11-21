@@ -2,11 +2,14 @@ services:
   - type: web
     name: ezyhelpers-triage-api
     runtime: python
+    plan: free
     rootDir: backend
-    buildCommand: pip install -r requirements.txt && pip install psycopg2-binary
+    buildCommand: pip install -r requirements.txt
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /health
     envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.8"
       - key: OPENROUTER_API_KEY
         sync: false
       - key: OPENROUTER_MODEL
@@ -16,13 +19,6 @@ services:
       - key: ALLOW_LIVE_AI
         value: "true"
       - key: DATABASE_URL
-        fromDatabase:
-          name: ezyhelpers-triage-db
-          property: connectionString
+        sync: false
       - key: CORS_ORIGINS
         sync: false
-
-databases:
-  - name: ezyhelpers-triage-db
-    plan: free
-
