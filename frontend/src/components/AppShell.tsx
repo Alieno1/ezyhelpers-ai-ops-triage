@@ -44,18 +44,16 @@ function SidebarContent({
 }) {
   return (
     <>
-      <div className="px-5 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between gap-2">
+      <div className="px-4 min-h-[56px] py-2.5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between gap-2">
         <Link href="/" onClick={onNavigate} className="flex items-center gap-2.5 min-w-0">
-          <div className="w-9 h-9 rounded-lg bg-white border border-slate-200 dark:border-slate-700 p-1 flex items-center justify-center shrink-0 shadow-2xs">
-            <Image
-              src="/ezyhelpers-logo.png"
-              alt="EzyHelpers logo"
-              width={36}
-              height={36}
-              className="w-full h-full object-contain"
-              priority
-            />
-          </div>
+          <Image
+            src="/ezyhelpers-logo.png"
+            alt="EzyHelpers logo"
+            width={50}
+            height={35}
+            className="h-9 w-auto object-contain shrink-0"
+            priority
+          />
           <div className="min-w-0">
             <div className="font-bold text-sm text-slate-900 dark:text-slate-100 leading-tight truncate">EzyHelpers</div>
             <div className="text-[11px] text-slate-500 dark:text-slate-400 truncate">AI Duty Desk Triage</div>
@@ -154,7 +152,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <div className="flex-1 flex flex-col min-w-0">
         {/* Sticky Header aligned with page max-w-7xl container */}
         <header className="sticky top-0 z-30 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xs border-b border-slate-200 dark:border-slate-800">
-          <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex flex-wrap items-center justify-between gap-2.5">
+          <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 min-h-[56px] py-2 flex flex-wrap items-center justify-between gap-2.5">
             <div className="flex items-center gap-2.5 flex-wrap min-w-0">
               <button
                 type="button"
@@ -167,14 +165,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <Link
                 href="/"
                 aria-label="EzyHelpers Home"
-                className="lg:hidden w-8 h-8 rounded-lg bg-white border border-slate-200 dark:border-slate-700 p-1 flex items-center justify-center shrink-0"
+                className="lg:hidden flex items-center shrink-0"
               >
                 <Image
                   src="/ezyhelpers-logo.png"
                   alt="EzyHelpers logo"
-                  width={32}
-                  height={32}
-                  className="w-full h-full object-contain"
+                  width={40}
+                  height={28}
+                  className="h-7 w-auto object-contain shrink-0"
                   priority
                 />
               </Link>
