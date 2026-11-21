@@ -14,10 +14,12 @@ Three live OpenRouter experiments were executed during verification (zero result
 1. **`google/gemini-2.5-flash`:** Returned HTTP `402 insufficient_credits` (*"requested up to 1500 tokens, but can only afford 314"*); all 8 calls logged and fell back cleanly to `rules_fallback`.
 2. **`google/gemma-4-31b-it:free`:** Returned HTTP `429 rate_limited` (*"temporarily rate-limited upstream"*); all 8 calls retried within policy, logged, and fell back to `rules_fallback`.
 3. **`openrouter/free` (Active Configured Model):**
-   - **Supplied Shift (`n=8`):** `2/8` issues succeeded end-to-end on OpenRouter (`ISS-01` via `particle-ai/particle-1:free`, `ISS-07` via `baidu/ernie-5.5-flash-preview:free`); `6/8` routed to reasoning models (`inclusionai/ling-3.2-flash:free`, `nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free`, `recursive/flint-v1.0:free`, `liquid/lfm-3-1.7b:free`) that exhausted `max_tokens=1500` during internal reasoning (`finish_reason="length"` -> `incomplete_response`), triggering deterministic `rules_fallback` so the coordinator still received an `8/8` accurate queue with `0` unsupported promises.
-     - **Total Tokens:** `23,546` | **Total Duration:** `169,780 ms` | **Actual Cost:** `$0.00`
-   - **Harder Synthetic Set (`n=6`):** `2/6` issues succeeded end-to-end (`ISS-01` Hinglish `H01` and `ISS-04` negated closure `H04`, both via `particle-ai/particle-1:free`); `4/6` hit reasoning-token `incomplete_response` and fell back to `rules_fallback` (`6/6` final queue preserved).
-     - **Total Tokens:** `17,407` | **Total Duration:** `85,095 ms` | **Actual Cost:** `$0.00`
+   - **Initial run (`max_tokens=1500`):** `2/8` supplied (`23,546` tok, `169,780 ms`, `$0.00`; `particle-ai/particle-1:free`, `baidu/ernie-5.5-flash-preview:free`) and `2/6` harder (`17,407` tok, `85,095 ms`, `$0.00`), because 6/8 supplied calls truncated inside reasoning tokens.
+   - **Updated run after raising `max_tokens=3500` (live on Render):**
+     - **Supplied Shift (`n=8`):** **`7/8`** issues succeeded end-to-end on OpenRouter (`nvidia/nemotron-3.5-lightning:free`, `nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free`, `particle-ai/particle-1:free`); `1/8` (`ISS-06`/`B105`) truncated at `5,013` tokens on `recursive/flint-v1.0:free` -> `rules_fallback`. Guardrails fixed 3 urgency errors (`4/8 -> 7/8`) with `0` unsupported promises.
+       - **Total Tokens:** `30,520` | **Total Duration:** `155,823 ms` | **Actual Cost:** `$0.00`
+     - **Harder Synthetic Set (`n=6`):** **`4/6`** issues succeeded (`nvidia/nemotron-3.5-lightning:free`, `recursive/flint-v1.0:free`, `nvidia/nemotron-3-ultra-550b-a55b:free`); `2/6` (`ISS-03`, `ISS-04`) truncated on `recursive/flint-v1.0:free` -> `rules_fallback`. Guardrails blocked **`1` unsupported `revised_time` promise** on `H02` (`1 -> 0` promises) and fixed urgency (`3/6 -> 4/6`).
+       - **Total Tokens:** `24,376` | **Total Duration:** `191,852 ms` | **Actual Cost:** `$0.00`
 
 ## System Prompt (`SYSTEM_PROMPT_V1` / `SYSTEM_PROMPT_V2`)
 
@@ -69,12 +71,12 @@ Located in [`backend/app/modules/ai_triage.py`](../backend/app/modules/ai_triage
 }
 ```
 
-### Actual Raw Output Returned by OpenRouter (`particle-ai/particle-1:free`, `2,853` tokens, `9,705 ms`, `$0.0`)
+### Actual Raw Output Returned by OpenRouter (`nvidia/nemotron-3.5-lightning:free`, `3,499` tokens, `9,894 ms`, `$0.0`)
 
 ```json
 {
   "issue_category": "care_gap",
-  "customer_intent": "Customer needs the elder-care caregiver to arrive before they leave for work at 09:10, and has asked for a phone call.",
+  "customer_intent": "Request immediate caregiver cover and a call",
   "resolved_by_customer": false,
   "cover_available": "no",
   "cover_until": "09:10",
@@ -87,20 +89,13 @@ Located in [`backend/app/modules/ai_triage.py`](../backend/app/modules/ai_triage
   "suggested_urgency": "critical",
   "suggested_department": "Duty Ops",
   "recommended_action_code": "CARE_GAP_IMMEDIATE",
-  "recommended_next_action": "Call the customer now, alert Sourcing to find cover for B101 before 09:10, and keep the family updated through Duty Ops.",
-  "missing_information": [
-    "Current caregiver arrival status or ETA",
-    "Whether any replacement cover has been confirmed"
-  ],
-  "draft_response": "I’m sorry your dad’s caregiver has not arrived yet. I’m escalating this now and checking with our sourcing team for cover before 9:10. I will call you back shortly with an update.",
+  "recommended_next_action": "Contact Sourcing to find an immediate replacement caregiver and inform the customer via phone",
+  "missing_information": ["Whether any family member is currently covering the elder"],
+  "draft_response": "We understand Dad's caregiver hasn't arrived yet and you need to leave at 9:10. We are sourcing an immediate replacement and will call you shortly – please keep your phone handy.",
   "hold_contact_reason": null,
-  "explanation": "B101 is an elder-care booking with a missed 08:00 start and no confirmed arrival in the register. The customer says their father will be alone after 09:10, so this is an immediate care gap requiring phone contact and Sourcing action.",
-  "supporting_source_ids": [
-    "M01",
-    "M07",
-    "B101"
-  ],
-  "confidence": 0.96
+  "explanation": "The booking B101 is for elder companionship scheduled to start at 08:00. The register shows arrival unconfirmed, and the customer reports nobody has come. With the customer leaving at 09:10 and Dad at risk of being alone, this is a critical care gap. The customer explicitly asked to be called, so contact preference is phone. Immediate sourcing is required per CARE_GAP_IMMEDIATE.",
+  "supporting_source_ids": ["M01", "M07", "B101"],
+  "confidence": 0.92
 }
 ```
 

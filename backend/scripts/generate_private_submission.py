@@ -246,6 +246,7 @@ def main() -> None:
     if live_calls:
         c1 = next((c for c in live_calls if c.get("issue_id") == "ISS-01"), live_calls[0])
         c4 = next((c for c in live_calls if c.get("issue_id") == "ISS-04"), live_calls[min(3, len(live_calls) - 1)])
+        used_models = ", ".join(sorted({str(c.get("model_used")) for c in live_calls if c.get("ok") and c.get("model_used")}))
         tot_tok = sum(c.get("total_tokens") or 0 for c in live_calls)
         tot_ms = sum(c.get("duration_ms") or 0 for c in live_calls)
         costs = [c.get("cost_usd") for c in live_calls if c.get("cost_usd") is not None]
@@ -254,7 +255,8 @@ def main() -> None:
 ## Live OpenRouter Execution Summary (Supplied Shift)
 
 - **Calls Executed:** {len(live_calls)} ({sum(1 for c in live_calls if c.get('ok'))} succeeded)
-- **Model Used:** `{c1.get('model_used') or settings.openrouter_model}` (Provider: `{c1.get('provider_upstream') or 'openrouter'}`)
+- **ISS-01 Model Used:** `{c1.get('model_used') or settings.openrouter_model}` (Provider: `{c1.get('provider_upstream') or 'openrouter'}`)
+- **All Succeeded Models Routed:** `{used_models or settings.openrouter_model}`
 - **Total Tokens:** {tot_tok} | **Total Duration:** {tot_ms} ms | **Reported Cost:** {tot_cost}
 
 ### Actual Raw Model Output — `ISS-01` (`B101`)
@@ -421,7 +423,7 @@ cd backend
     story.append(_styled_table(q_rows, [11 * mm, 18 * mm, 18 * mm, 18 * mm, 18 * mm, 16 * mm, 71 * mm], f_reg, f_bold))
     story.append(Spacer(1, 3 * mm))
     story.append(p("Draft Responses / Hold Reasons & Human Review Flags (Drafts Only — Never Auto-Sent)", ParagraphStyle("H2", parent=st_h1, fontSize=10.5, leading=14)))
-    draft_rows = [["Rank", "Issue / Bk", "Review Flags / Human Corrections", "Draft Response or Reason to Hold Contact"]]
+    draft_rows = [["Rank", "Issue / Bk", "Review / Corrections", "Draft Response or Reason to Hold Contact"]]
     for iss in run_s.issues:
         f = iss.final
         rev_txt = ("REVIEW: " + "; ".join(f.human_review_reasons)) if f.human_review_required and f.human_review_reasons else ("REVIEW REQUIRED" if f.human_review_required else "No flag (coordinator approves draft)")
@@ -442,7 +444,7 @@ cd backend
     story.append(p("15. AI-Assisted Implementation", st_h1))
     story.append(p("OpenRouter chat completions (ai_triage.py + pipeline.py) accepts PII-redacted issue payloads, enforces strict AITriageOutput Pydantic validation (with 1 repair retry), then feeds signals through the identical deterministic guardrails and promise detector."))
     story.append(p("16. Model Selection", st_h1))
-    story.append(p(f"Configured model: {settings.openrouter_model} via OpenRouter (https://openrouter.ai/api/v1/chat/completions). Selected for zero-cost structured JSON routing during evaluation (routed completed calls via particle-ai/particle-1:free and baidu/ernie-5.5-flash-preview:free); a funded non-reasoning model such as google/gemini-2.5-flash is configurable via OPENROUTER_MODEL for production shifts."))
+    story.append(p(f"Configured model: {settings.openrouter_model} via OpenRouter (https://openrouter.ai/api/v1/chat/completions). Selected for zero-cost structured JSON routing during evaluation (live completed calls routed via nvidia/nemotron-3.5-lightning:free, nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free, nvidia/nemotron-3-ultra-550b-a55b:free, particle-ai/particle-1:free, and recursive/flint-v1.0:free); a funded non-reasoning model such as google/gemini-2.5-flash is configurable via OPENROUTER_MODEL for production shifts."))
 
     # 17. Actual model input and raw output
     story.append(p("17. Actual Model Input and Raw Output", st_h1))
@@ -450,7 +452,7 @@ cd backend
         c1 = next((c for c in live_calls if c.get("issue_id") == "ISS-01"), live_calls[0])
         raw_str = c1.get("raw_content") or str(c1.get("error_message"))
         ok_cnt = sum(1 for c in live_calls if c.get("ok"))
-        story.append(p(f"Live OpenRouter run summary ({len(live_calls)} calls: {ok_cnt} succeeded, {len(live_calls) - ok_cnt} truncated on free reasoning models at max_tokens=1500 and fell back safely to rules_fallback). ISS-01 executed on {c1.get('model_used') or settings.openrouter_model} (Call ID: {c1.get('call_id')}, Tokens: {c1.get('total_tokens')}, Latency: {c1.get('duration_ms')} ms, Cost: ${c1.get('cost_usd')}). Actual redacted input for ISS-01:"))
+        story.append(p(f"Live OpenRouter run summary ({len(live_calls)} calls at max_tokens=3500: {ok_cnt} succeeded, {len(live_calls) - ok_cnt} truncated on free reasoning model and fell back safely to rules_fallback). ISS-01 executed on {c1.get('model_used') or settings.openrouter_model} (Call ID: {c1.get('call_id')}, Tokens: {c1.get('total_tokens')}, Latency: {c1.get('duration_ms')} ms, Cost: ${c1.get('cost_usd')}). Actual redacted input for ISS-01:"))
         story.append(Paragraph(p1.replace("\n", "<br/>").replace(" ", "&nbsp;"), st_code))
         story.append(p("Actual raw JSON output returned by OpenRouter for ISS-01:"))
         story.append(Paragraph(raw_str.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\n", "<br/>").replace(" ", "&nbsp;"), st_code))
@@ -476,13 +478,13 @@ cd backend
     story.append(Spacer(1, 4 * mm))
     story.append(_eval_chart(rep_s, rep_h, f_reg))
     story.append(p("20. Failure and Disagreement", st_h1))
-    story.append(p("Baseline rules_v1 failed on M04 (B104: Hinglish 'Kal cook ko 8 ki jagah 10 baje bhej sakte ho?') returning MANUAL_TRIAGE instead of SCHEDULE_CHANGE_SOURCING_CHECK (7/8). On the harder synthetic set, rules_v1 failed on H01 (B201: 'Didi abhi tak nahi aayi... call karo') returning MANUAL_TRIAGE instead of CARE_GAP_IMMEDIATE via phone (5/6)."))
+    story.append(p("Baseline rules_v1 failed on M04 (B104: Hinglish 'Kal cook ko 8 ki jagah 10 baje bhej sakte ho?') returning MANUAL_TRIAGE instead of SCHEDULE_CHANGE_SOURCING_CHECK (7/8). On the harder synthetic set, rules_v1 failed on H01 (B201: 'Didi abhi tak nahi aayi... call karo') returning MANUAL_TRIAGE instead of CARE_GAP_IMMEDIATE via phone (5/6). On live OpenRouter, deterministic guardrails rescued 3 urgency errors in ai_v1_raw on supplied (M04 low->medium, M10 low->high, M11 none->medium, lifting urgency 4/8 -> 7/8) and caught 1 unsupported revised-time promise (R4) in ai_v1_raw on harder H02 (reducing promises 1 -> 0 in ai_v1_guarded)."))
     if rep_s.disagreements_and_failures:
         ai_dis = [d for d in rep_s.disagreements_and_failures if d.variant.startswith("ai_")]
         if ai_dis:
             story.append(p(f"AI evaluation notes ({len(ai_dis)} item(s) across raw/guarded on supplied): " + "; ".join(f"[{d.variant}] {','.join(d.source_message_ids)}: {d.actual} (expected {d.expected})" for d in ai_dis[:4])))
     story.append(p("21. Improvement and Rerun", st_h1))
-    story.append(p("Adding targeted Hinglish schedule, gap, and call patterns + requested_change time parsing in rules_v2 lifted supplied accuracy from 7/8 to 8/8 (+1) and harder synthetic accuracy from 5/6 to 6/6 (+1), with 0 unsupported promises across all cases."))
+    story.append(p("Two verified iterations: (1) Adding targeted Hinglish schedule, gap, and call patterns + requested_change time parsing in rules_v2 lifted supplied accuracy from 7/8 to 8/8 (+1) and harder synthetic accuracy from 5/6 to 6/6 (+1), with 0 unsupported promises. (2) Raising OpenRouter max_tokens from 1500 to 3500 lifted live AI supplied completion from 2/8 to 7/8 and harder completion from 2/6 to 4/6 at $0.0 cost."))
 
     # 22. Fallback mechanism
     story.append(p("22. Fallback Mechanism", st_h1))

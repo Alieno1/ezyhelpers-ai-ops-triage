@@ -112,6 +112,6 @@ All 20 tests run against isolated temporary SQLite databases and `httpx.MockTran
 
 ## Known Limitations
 
-- **Free-Tier OpenRouter Variability:** Live execution on `openrouter/free` succeeded cleanly on non-reasoning routes (`particle-ai/particle-1:free`, `baidu/ernie-5.5-flash-preview:free`), whereas reasoning models routed by `openrouter/free` truncated inside `max_tokens=1500` (`incomplete_response`), triggering automatic `rules_fallback`. Paid non-reasoning models such as `google/gemini-2.5-flash` avoid reasoning-token truncation when funded.
+- **Free-Tier OpenRouter Variability:** Live execution on `openrouter/free` (`max_tokens=3500`) completed **`7/8`** supplied (`30,520` tokens, `$0.00`) and **`4/6`** harder issues across free models (`nvidia/nemotron-3.5-lightning:free`, `nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free`, `particle-ai/particle-1:free`), while remaining heavy reasoning truncations (`recursive/flint-v1.0:free`) triggered automatic `rules_fallback` (`8/8` final queue, `0` unsupported promises). Paid non-reasoning models such as `google/gemini-2.5-flash` avoid reasoning-token truncation when funded.
 - **Small Evaluation Sample:** The supplied shift has 12 messages (`n=8` distinct issues), supplemented by `n=6` synthetic harder edge cases; metrics demonstrate deterministic behavior and guardrail coverage, not statistical significance.
 - **External Integration Scope:** Outgoing replies are intentionally draft-only; WhatsApp Business API sending and live CRM write-backs are out of scope for safety.
