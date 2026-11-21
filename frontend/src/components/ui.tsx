@@ -109,6 +109,18 @@ export function formatRunStatus(status: string): string {
   return status.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
+export function formatVariantLabel(variant: string): string {
+  const map: Record<string, string> = {
+    rules_v1: "Rules v1 (Baseline)",
+    rules_v2: "Rules v2 (Improved)",
+    ai_prompt_v1: "AI-Assisted (Prompt v1)",
+    ai_prompt_v2: "AI-Assisted (Prompt v2)",
+    ai_guarded: "AI-Assisted (Guarded)",
+  };
+  if (map[variant]) return map[variant];
+  return variant.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 export function formatShortTime(iso: string): string {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return iso;

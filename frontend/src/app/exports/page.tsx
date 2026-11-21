@@ -211,12 +211,12 @@ export default function ExportsAndModelPage() {
       <div className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-5 shadow-xs space-y-2.5">
         <div className="flex items-center gap-2 text-sm font-bold text-slate-900 dark:text-slate-100">
           <BookOpen className="w-4 h-4 text-slate-700 dark:text-slate-300" />
-          Coordinator Quick-Start SOP (124 words)
+          Coordinator Quick-Start Guide
         </div>
         <div className="text-sm text-slate-700 dark:text-slate-200 leading-relaxed bg-slate-50 rounded-lg border border-slate-200 dark:bg-slate-800/70 dark:border-slate-700 p-4">
           Open <strong>Priority Queue</strong> at 09:00 and take rank <strong>#1</strong> first — uncovered elder or child care gaps outrank everything else. Before dialling, open the issue and check two panels: the <strong>Message Timeline</strong> (for preferences like &ldquo;WhatsApp, don&rsquo;t call&rdquo;) and the <strong>Booking Register</strong> (sole authority on arrivals, substitutes, refund approvals, and payout dates). Never promise an ETA, substitute, refund approval, or quote missing from the register.
           <br /><br />
-          If priority, owner, or next action looks wrong, submit a decision in <strong>Coordinator Review</strong> (<code>change_priority</code>, <code>change_department</code>, <code>correct_action</code>, or <code>edit_draft</code>) with a brief reason so the queue re-ranks immediately. Drafts are never auto-sent — copy an approved draft manually or hold contact. Escalate uncertain booking identities via <strong>Request More Information</strong> and close verified arrivals via <strong>Resolve</strong>.
+          If priority, owner, or next action looks wrong, submit a decision in <strong>Coordinator Review</strong> (<strong>Change Priority</strong>, <strong>Change Department</strong>, <strong>Correct Next Action</strong>, or <strong>Edit Draft</strong>) with a brief reason so the queue re-ranks immediately. Drafts are never auto-sent — copy an approved draft manually or hold contact. Escalate uncertain booking identities via <strong>Request More Information</strong> and close verified arrivals via <strong>Resolve</strong>.
         </div>
       </div>
     </div>

@@ -24,6 +24,7 @@ import {
   SuccessBanner,
   UrgencyBadge,
   formatShortTime,
+  formatVariantLabel,
 } from "@/components/ui";
 import { getIssueDetail, submitReview } from "@/lib/api";
 import type { DQIssue, IssueResult, Recommendation, ReviewRecord } from "@/lib/types";
@@ -161,7 +162,11 @@ export default function IssueDetailPage() {
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 break-words">
               Booking: <span className="font-mono font-semibold">{issue.group.booking_id || "Unlinked"}</span> · Messages:{" "}
               <span className="font-mono">{issue.group.source_message_ids.join(", ")}</span>
-              {runMeta && <span className="ml-0 sm:ml-2 block sm:inline">· Run {runMeta.run_id}</span>}
+              {runMeta && (
+                <span title={`Run ID: ${runMeta.run_id}`} className="ml-0 sm:ml-2 block sm:inline">
+                  · Mode: <span className="font-medium text-slate-700 dark:text-slate-300">{formatVariantLabel(runMeta.variant)}</span>
+                </span>
+              )}
             </p>
           </div>
         </div>

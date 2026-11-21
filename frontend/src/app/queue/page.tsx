@@ -12,6 +12,7 @@ import {
   SourceBadge,
   StatusBadge,
   UrgencyBadge,
+  formatVariantLabel,
 } from "@/components/ui";
 import { getIssues } from "@/lib/api";
 import type { IssueResult } from "@/lib/types";
@@ -70,8 +71,11 @@ export default function QueuePage() {
           <p className="text-sm text-slate-500 dark:text-slate-400 break-words">
             One row per distinct issue, ranked by deterministic care-gap rules and customer deadlines.
             {meta && (
-              <span className="ml-0 sm:ml-2 block sm:inline text-xs text-slate-400 dark:text-slate-500 mt-0.5 sm:mt-0">
-                Run <code className="font-mono">{meta.run_id}</code> ({meta.variant})
+              <span
+                title={`Run ID: ${meta.run_id}`}
+                className="ml-0 sm:ml-2 block sm:inline text-xs text-slate-400 dark:text-slate-500 mt-0.5 sm:mt-0"
+              >
+                · Mode: <strong className="font-medium text-slate-600 dark:text-slate-300">{formatVariantLabel(meta.variant)}</strong>
               </span>
             )}
           </p>

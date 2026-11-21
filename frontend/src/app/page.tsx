@@ -16,6 +16,7 @@ import {
   UrgencyBadge,
   formatRunStatus,
   formatShortTime,
+  formatVariantLabel,
 } from "@/components/ui";
 import { getOverview, resetDataset, runAiPipeline, runRulesPipeline } from "@/lib/api";
 import type { OverviewResponse } from "@/lib/types";
@@ -66,7 +67,7 @@ export default function OverviewPage() {
     setNotice(null);
     try {
       const res = await runRulesPipeline(dataset, version);
-      setNotice(`Completed ${res.variant} run (${res.run_id}).`);
+      setNotice(`Completed ${formatVariantLabel(res.variant)} triage run.`);
       await load();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Rules run failed");
@@ -82,10 +83,10 @@ export default function OverviewPage() {
     try {
       const res = await runAiPipeline(dataset, "v1");
       if (res.status === "completed") {
-        setNotice(`AI run (${res.run_id}) completed on OpenRouter model ${res.model}.`);
+        setNotice(`AI-Assisted run completed using OpenRouter model ${res.model}.`);
       } else {
         setNotice(
-          `AI run (${res.run_id}) finished with status '${res.status}': ${res.notes.join(" ")}`
+          `AI run finished (${formatRunStatus(res.status)}): ${res.notes.join(" ")}`
         );
       }
       await load();
@@ -156,12 +157,8 @@ export default function OverviewPage() {
         <div className="min-w-0">
           <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100">Shift Triage Overview</h1>
           <p className="text-sm text-slate-500 dark:text-slate-400 flex flex-wrap items-center gap-x-2 gap-y-0.5">
-            <span>
-              Active Run: <code className="font-mono text-slate-700 dark:text-slate-300">{data.run_id}</code>
-            </span>
-            <span>·</span>
-            <span>
-              Variant: <strong className="text-slate-700 dark:text-slate-200">{data.variant}</strong>
+            <span title={`Run ID: ${data.run_id}`}>
+              Mode: <strong className="text-slate-700 dark:text-slate-200">{formatVariantLabel(data.variant)}</strong>
             </span>
             <span>·</span>
             <span>
@@ -369,7 +366,7 @@ export default function OverviewPage() {
                 <tr key={r.run_id}>
                   <td className="py-2 px-3 font-mono whitespace-nowrap">{r.run_id}</td>
                   <td className="py-2 px-3 whitespace-nowrap">{r.mode}</td>
-                  <td className="py-2 px-3 font-mono whitespace-nowrap">{r.variant}</td>
+                  <td className="py-2 px-3 whitespace-nowrap">{formatVariantLabel(r.variant)}</td>
                   <td className="py-2 px-3 font-mono whitespace-nowrap">{r.model || "-"}</td>
                   <td className="py-2 px-3 whitespace-nowrap">{formatRunStatus(r.status)}</td>
                   <td className="py-2 px-3 font-mono text-slate-500 dark:text-slate-400 whitespace-nowrap">{formatShortTime(r.finished_at)}</td>

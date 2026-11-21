@@ -107,7 +107,7 @@ export default function EvaluationPage() {
         <div className="min-w-0">
           <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100">Rules vs AI Evaluation</h1>
           <p className="text-sm text-slate-500 dark:text-slate-400 break-words">
-            Scored against frozen <code className="font-mono">{report.expected_file}</code> ({report.total_cases} cases).
+            Evaluated against {report.total_cases} pre-defined benchmark cases (<code className="font-mono">{report.expected_file}</code>).
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
