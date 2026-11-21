@@ -81,18 +81,22 @@ class LLMCallRow(Base):
 
 def normalize_db_url(url: str) -> str:
     if url.startswith("postgres://"):
-        return "postgresql://" + url[len("postgres://"):]
+        return "postgresql+psycopg://" + url[len("postgres://"):]
+    if url.startswith("postgresql://"):
+        return "postgresql+psycopg://" + url[len("postgresql://"):]
     return url
 
 
 def build_engine(database_url: str):
     url = normalize_db_url(database_url)
-    kwargs: dict = {"future": True}
+    kwargs: dict = {}
     if url.startswith("sqlite"):
         kwargs["connect_args"] = {"check_same_thread": False}
     else:
         kwargs["pool_pre_ping"] = True
         kwargs["pool_recycle"] = 300
+        if url.startswith("postgresql+psycopg://"):
+            kwargs["connect_args"] = {"prepare_threshold": None}
     return create_engine(url, **kwargs)
 
 

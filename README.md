@@ -100,7 +100,7 @@ All 20 tests run against isolated temporary SQLite databases and `httpx.MockTran
 
 ## Deployment Instructions
 
-- **Backend (Render + optional Neon PostgreSQL):** Blueprint defined in [`render.yaml`](render.yaml) (`rootDir: backend`, `buildCommand: pip install -r requirements.txt && pip install psycopg2-binary`, `startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT`, `healthCheckPath: /health`). Set `OPENROUTER_API_KEY`, `DATABASE_URL`, and `CORS_ORIGINS` (your Vercel URL) in Render secrets.
+- **Backend (Render + optional Neon PostgreSQL):** Blueprint defined in [`render.yaml`](render.yaml) (`rootDir: backend`, `buildCommand: pip install -r requirements.txt`, `startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT`, `healthCheckPath: /health`). Set `OPENROUTER_API_KEY`, `DATABASE_URL`, and `CORS_ORIGINS` (your Vercel URL) in Render secrets.
 - **Frontend (Vercel):** Set Root Directory to `frontend`, Framework Preset `Next.js`, Build Command `npm run build`, and environment variable `NEXT_PUBLIC_API_URL=https://<your-render-service>.onrender.com`. `.vercelignore` excludes `private_submission/` and `.pdf` assets.
 
 ## Known Limitations

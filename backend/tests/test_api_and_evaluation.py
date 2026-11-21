@@ -8,6 +8,7 @@ from fastapi.testclient import TestClient
 from openpyxl import load_workbook
 
 from app.config import Settings
+from app.db import normalize_db_url
 from app.main import create_app
 
 PROJECT_DIR = Path(__file__).resolve().parents[2]
@@ -29,6 +30,11 @@ def _make_client(tmp_path: Path, api_key: str = "") -> TestClient:
 
 
 def test_health_overview_and_security_controls(tmp_path: Path) -> None:
+    assert normalize_db_url("postgres://u:p@h/db") == "postgresql+psycopg://u:p@h/db"
+    assert normalize_db_url("postgresql://u:p@h/db?sslmode=require") == "postgresql+psycopg://u:p@h/db?sslmode=require"
+    assert normalize_db_url("postgresql+psycopg2://u:p@h/db") == "postgresql+psycopg2://u:p@h/db"
+    assert normalize_db_url("sqlite:///triage.db") == "sqlite:///triage.db"
+
     client = _make_client(tmp_path, api_key="sk-or-secret-test-value")
     r_health = client.get("/health")
     assert r_health.status_code == 200
