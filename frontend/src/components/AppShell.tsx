@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -44,15 +45,22 @@ function SidebarContent({
   return (
     <>
       <div className="px-5 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2.5 min-w-0">
-          <div className="w-8 h-8 rounded-lg bg-slate-900 text-white dark:bg-sky-500 dark:text-slate-950 flex items-center justify-center font-bold text-sm shrink-0">
-            EH
+        <Link href="/" onClick={onNavigate} className="flex items-center gap-2.5 min-w-0">
+          <div className="w-9 h-9 rounded-lg bg-white border border-slate-200 dark:border-slate-700 p-1 flex items-center justify-center shrink-0 shadow-2xs">
+            <Image
+              src="/ezyhelpers-logo.png"
+              alt="EzyHelpers logo"
+              width={36}
+              height={36}
+              className="w-full h-full object-contain"
+              priority
+            />
           </div>
           <div className="min-w-0">
             <div className="font-bold text-sm text-slate-900 dark:text-slate-100 leading-tight truncate">EzyHelpers</div>
             <div className="text-[11px] text-slate-500 dark:text-slate-400 truncate">AI Duty Desk Triage</div>
           </div>
-        </div>
+        </Link>
         {showClose && (
           <button
             type="button"
@@ -156,9 +164,20 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               >
                 <Menu className="w-4 h-4" />
               </button>
-              <div className="lg:hidden w-7 h-7 rounded-md bg-slate-900 text-white dark:bg-sky-500 dark:text-slate-950 flex items-center justify-center font-bold text-xs shrink-0">
-                EH
-              </div>
+              <Link
+                href="/"
+                aria-label="EzyHelpers Home"
+                className="lg:hidden w-8 h-8 rounded-lg bg-white border border-slate-200 dark:border-slate-700 p-1 flex items-center justify-center shrink-0"
+              >
+                <Image
+                  src="/ezyhelpers-logo.png"
+                  alt="EzyHelpers logo"
+                  width={32}
+                  height={32}
+                  className="w-full h-full object-contain"
+                  priority
+                />
+              </Link>
               <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200 text-xs font-medium whitespace-nowrap">
                 <Clock className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400 shrink-0" />
                 Mon 23 Nov 2026 · 09:00 IST
