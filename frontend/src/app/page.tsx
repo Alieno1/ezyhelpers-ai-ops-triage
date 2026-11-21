@@ -119,9 +119,35 @@ export default function OverviewPage() {
   const fc = data.first_callback;
   const gridColor = isDark ? "#334155" : "#e2e8f0";
   const axisTick = { fontSize: 11, fill: isDark ? "#94a3b8" : "#475569" };
+  const tooltipCursor = {
+    fill: isDark ? "rgba(148, 163, 184, 0.14)" : "rgba(15, 23, 42, 0.06)",
+  };
   const tooltipStyle = isDark
-    ? { backgroundColor: "#0f172a", borderColor: "#334155", color: "#f1f5f9", fontSize: 12 }
-    : { backgroundColor: "#ffffff", borderColor: "#e2e8f0", color: "#0f172a", fontSize: 12 };
+    ? {
+        backgroundColor: "#0f172a",
+        borderColor: "#475569",
+        borderRadius: 8,
+        boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.5)",
+        color: "#f8fafc",
+        fontSize: 12,
+      }
+    : {
+        backgroundColor: "#ffffff",
+        borderColor: "#cbd5e1",
+        borderRadius: 8,
+        boxShadow: "0 10px 25px -5px rgba(15, 23, 42, 0.12)",
+        color: "#0f172a",
+        fontSize: 12,
+      };
+  const tooltipLabelStyle = {
+    color: isDark ? "#f8fafc" : "#0f172a",
+    fontWeight: 600,
+    marginBottom: 2,
+  };
+  const tooltipItemStyle = {
+    color: isDark ? "#e2e8f0" : "#1e293b",
+    fontWeight: 500,
+  };
 
   return (
     <div className="space-y-6">
@@ -269,10 +295,15 @@ export default function OverviewPage() {
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={data.urgency_breakdown} margin={{ top: 4, right: 8, left: -16, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
-                  <XAxis dataKey="urgency" tick={axisTick} />
-                  <YAxis allowDecimals={false} tick={axisTick} />
-                  <Tooltip contentStyle={tooltipStyle} />
-                  <Bar dataKey="count" radius={[4, 4, 0, 0]}>
+                  <XAxis dataKey="urgency" tick={axisTick} axisLine={{ stroke: gridColor }} tickLine={{ stroke: gridColor }} />
+                  <YAxis allowDecimals={false} tick={axisTick} axisLine={{ stroke: gridColor }} tickLine={{ stroke: gridColor }} />
+                  <Tooltip
+                    cursor={tooltipCursor}
+                    contentStyle={tooltipStyle}
+                    labelStyle={tooltipLabelStyle}
+                    itemStyle={tooltipItemStyle}
+                  />
+                  <Bar dataKey="count" name="Issues" fill={isDark ? "#60a5fa" : "#2563eb"} radius={[4, 4, 0, 0]}>
                     {data.urgency_breakdown.map((entry) => (
                       <Cell key={entry.urgency} fill={URGENCY_COLORS[entry.urgency] || "#475569"} />
                     ))}
@@ -290,10 +321,15 @@ export default function OverviewPage() {
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={data.department_breakdown} margin={{ top: 4, right: 8, left: -16, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
-                  <XAxis dataKey="department" tick={axisTick} />
-                  <YAxis allowDecimals={false} tick={axisTick} />
-                  <Tooltip contentStyle={tooltipStyle} />
-                  <Bar dataKey="count" fill={isDark ? "#38bdf8" : "#0f172a"} radius={[4, 4, 0, 0]} />
+                  <XAxis dataKey="department" tick={axisTick} axisLine={{ stroke: gridColor }} tickLine={{ stroke: gridColor }} />
+                  <YAxis allowDecimals={false} tick={axisTick} axisLine={{ stroke: gridColor }} tickLine={{ stroke: gridColor }} />
+                  <Tooltip
+                    cursor={tooltipCursor}
+                    contentStyle={tooltipStyle}
+                    labelStyle={tooltipLabelStyle}
+                    itemStyle={tooltipItemStyle}
+                  />
+                  <Bar dataKey="count" name="Issues" fill={isDark ? "#38bdf8" : "#0f172a"} radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             )}
