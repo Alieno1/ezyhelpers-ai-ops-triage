@@ -65,12 +65,12 @@ export default function QueuePage() {
   return (
     <div className="space-y-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
+        <div className="min-w-0">
           <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100">Actionable Priority Queue</h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400">
+          <p className="text-sm text-slate-500 dark:text-slate-400 break-words">
             One row per distinct issue, ranked by deterministic care-gap rules and customer deadlines.
             {meta && (
-              <span className="ml-2 text-xs text-slate-400 dark:text-slate-500">
+              <span className="ml-0 sm:ml-2 block sm:inline text-xs text-slate-400 dark:text-slate-500 mt-0.5 sm:mt-0">
                 Run <code className="font-mono">{meta.run_id}</code> ({meta.variant})
               </span>
             )}
@@ -78,7 +78,7 @@ export default function QueuePage() {
         </div>
         <Link
           href="/exports"
-          className="px-3 py-1.5 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+          className="px-3 py-1.5 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 shrink-0"
         >
           Export CSV / XLSX
         </Link>
@@ -88,7 +88,7 @@ export default function QueuePage() {
       <div className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-4 shadow-xs space-y-3">
         <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
           <div className="flex items-center gap-1.5 font-semibold text-slate-700 dark:text-slate-200">
-            <Filter className="w-3.5 h-3.5" /> Filter & Sort Queue
+            <Filter className="w-3.5 h-3.5" /> Filter &amp; Sort Queue
           </div>
           {activeFilterCount > 0 && (
             <button
@@ -100,7 +100,7 @@ export default function QueuePage() {
                 setReviewOnly(false);
                 setSearch("");
               }}
-              className="text-slate-600 dark:text-slate-300 underline hover:text-slate-900 dark:hover:text-white"
+              className="text-slate-600 dark:text-slate-300 underline hover:text-slate-900 dark:hover:text-white cursor-pointer"
             >
               Clear {activeFilterCount} filter(s)
             </button>
@@ -158,7 +158,7 @@ export default function QueuePage() {
               aria-label="Sort by"
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
-              className="flex-1 rounded-lg border border-slate-300 px-2 py-1.5 text-sm bg-white text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+              className="flex-1 min-w-0 rounded-lg border border-slate-300 px-2 py-1.5 text-sm bg-white text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
             >
               <option value="priority_rank">Sort: Rank</option>
               <option value="urgency">Sort: Urgency</option>
@@ -169,7 +169,7 @@ export default function QueuePage() {
               type="button"
               onClick={() => setSortDir((d) => (d === "asc" ? "desc" : "asc"))}
               title={`Toggle sort (${sortDir})`}
-              className="p-2 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700"
+              className="p-2 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 cursor-pointer shrink-0"
             >
               <ArrowUpDown className="w-4 h-4 text-slate-600 dark:text-slate-300" />
             </button>
@@ -190,119 +190,202 @@ export default function QueuePage() {
       {loading ? (
         <LoadingPanel />
       ) : (
-        <div className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 shadow-xs overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse text-sm">
-              <thead>
-                <tr className="bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-600 dark:bg-slate-800/70 dark:border-slate-800 dark:text-slate-400 uppercase tracking-wider">
-                  <th className="py-3 px-4">#</th>
-                  <th className="py-3 px-4">Issue / Booking</th>
-                  <th className="py-3 px-4">Urgency</th>
-                  <th className="py-3 px-4">Department</th>
-                  <th className="py-3 px-4">Next Action & Channel</th>
-                  <th className="py-3 px-4">Source IDs</th>
-                  <th className="py-3 px-4">Status & Source</th>
-                  <th className="py-3 px-4 text-right">Inspect</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-                {issues.length === 0 ? (
-                  <tr>
-                    <td colSpan={8} className="py-8 text-center text-slate-500 dark:text-slate-400">
-                      No issues match the current filters.
-                    </td>
-                  </tr>
-                ) : (
-                  issues.map((iss) => {
-                    const f = iss.final;
-                    return (
-                      <tr key={iss.issue_id} className="hover:bg-slate-50/70 dark:hover:bg-slate-800/50 align-top">
-                        <td className="py-3.5 px-4 font-bold text-slate-900 dark:text-slate-100 tabular-nums">
-                          {f.priority_rank ?? "-"}
-                        </td>
-                        <td className="py-3.5 px-4 whitespace-nowrap">
-                          <Link
-                            href={`/issues/${iss.issue_id}`}
-                            className="font-semibold text-slate-900 dark:text-slate-100 hover:underline"
-                          >
+        <>
+          {/* Mobile / Tablet Card View */}
+          <div className="md:hidden space-y-3">
+            {issues.length === 0 ? (
+              <div className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-6 text-center text-sm text-slate-500 dark:text-slate-400">
+                No issues match the current filters.
+              </div>
+            ) : (
+              issues.map((iss) => {
+                const f = iss.final;
+                return (
+                  <div
+                    key={iss.issue_id}
+                    className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-4 shadow-xs space-y-2.5"
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="font-bold text-slate-900 dark:text-slate-100 tabular-nums">#{f.priority_rank ?? "-"}</span>
+                          <Link href={`/issues/${iss.issue_id}`} className="font-bold text-slate-900 dark:text-slate-100 hover:underline">
                             {iss.issue_id}
                           </Link>
-                          <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 font-mono">
+                          <span className="font-mono text-xs text-slate-500 dark:text-slate-400">
                             {iss.group.booking_id || "Unlinked"}
                             {iss.booking?.locality ? ` · ${iss.booking.locality}` : ""}
-                          </div>
-                        </td>
-                        <td className="py-3.5 px-4 whitespace-nowrap">
-                          <UrgencyBadge urgency={f.urgency} />
-                          {f.deadline && (
-                            <div className="text-[11px] text-rose-700 dark:text-rose-400 font-medium mt-1">
-                              Deadline: {f.deadline}
-                            </div>
-                          )}
-                        </td>
-                        <td className="py-3.5 px-4 whitespace-nowrap">
-                          <DepartmentBadge department={f.responsible_department} />
-                          {f.supporting_departments.length > 0 && (
-                            <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
-                              + {f.supporting_departments.join(", ")}
-                            </div>
-                          )}
-                        </td>
-                        <td className="py-3.5 px-4 max-w-md">
-                          <div className="flex items-center gap-2 mb-1">
-                            <ChannelBadge channel={f.contact_channel} />
-                            <code className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">{f.action_code}</code>
-                          </div>
-                          <div className="text-slate-800 dark:text-slate-200 text-xs leading-relaxed">{f.next_action}</div>
-                          {f.missing_information.length > 0 && (
-                            <div className="mt-1 text-[11px] text-amber-800 dark:text-amber-300">
-                              Missing: {f.missing_information[0]}
-                              {f.missing_information.length > 1 ? ` (+${f.missing_information.length - 1})` : ""}
-                            </div>
-                          )}
-                        </td>
-                        <td className="py-3.5 px-4 whitespace-nowrap">
-                          <div className="flex flex-wrap gap-1">
-                            {iss.group.source_message_ids.map((mid) => (
-                              <span
-                                key={mid}
-                                className="px-1.5 py-0.5 rounded bg-slate-100 border border-slate-200 dark:bg-slate-800 dark:border-slate-700 font-mono text-xs text-slate-700 dark:text-slate-200"
-                              >
-                                {mid}
-                              </span>
-                            ))}
-                          </div>
-                          <div className="text-[11px] text-slate-400 dark:text-slate-500 mt-1">
-                            Threads: {iss.group.thread_ids.join(", ") || "-"}
-                          </div>
-                        </td>
-                        <td className="py-3.5 px-4 whitespace-nowrap space-y-1">
-                          <div>
-                            <StatusBadge status={f.status} />
-                          </div>
-                          <div>
-                            <SourceBadge source={f.source} />
-                          </div>
-                          {f.human_review_required && (
-                            <div className="text-[11px] font-medium text-amber-700 dark:text-amber-300">Human Review Flagged</div>
-                          )}
-                        </td>
-                        <td className="py-3.5 px-4 text-right whitespace-nowrap">
-                          <Link
-                            href={`/issues/${iss.issue_id}`}
-                            className="inline-flex items-center px-2.5 py-1 rounded-lg bg-slate-900 text-white text-xs font-medium hover:bg-slate-800 dark:bg-sky-500 dark:text-slate-950 dark:hover:bg-sky-400"
+                          </span>
+                        </div>
+                      </div>
+                      <Link
+                        href={`/issues/${iss.issue_id}`}
+                        className="inline-flex items-center px-2.5 py-1 rounded-lg bg-slate-900 text-white text-xs font-medium hover:bg-slate-800 dark:bg-sky-500 dark:text-slate-950 dark:hover:bg-sky-400 shrink-0"
+                      >
+                        Review
+                      </Link>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <UrgencyBadge urgency={f.urgency} />
+                      <DepartmentBadge department={f.responsible_department} />
+                      <ChannelBadge channel={f.contact_channel} />
+                      <StatusBadge status={f.status} />
+                      <SourceBadge source={f.source} />
+                    </div>
+
+                    {f.deadline && (
+                      <div className="text-xs text-rose-700 dark:text-rose-400 font-medium">
+                        Deadline: {f.deadline}
+                      </div>
+                    )}
+
+                    <div className="text-xs text-slate-800 dark:text-slate-200 leading-relaxed">{f.next_action}</div>
+
+                    {f.missing_information.length > 0 && (
+                      <div className="text-[11px] text-amber-800 dark:text-amber-300">
+                        Missing: {f.missing_information[0]}
+                        {f.missing_information.length > 1 ? ` (+${f.missing_information.length - 1})` : ""}
+                      </div>
+                    )}
+
+                    <div className="flex flex-wrap items-center justify-between gap-2 pt-1.5 border-t border-slate-100 dark:border-slate-800 text-[11px] text-slate-500 dark:text-slate-400">
+                      <div className="flex flex-wrap items-center gap-1">
+                        {iss.group.source_message_ids.map((mid) => (
+                          <span
+                            key={mid}
+                            className="px-1.5 py-0.5 rounded bg-slate-100 border border-slate-200 dark:bg-slate-800 dark:border-slate-700 font-mono text-slate-700 dark:text-slate-200"
                           >
-                            Review
-                          </Link>
-                        </td>
-                      </tr>
-                    );
-                  })
-                )}
-              </tbody>
-            </table>
+                            {mid}
+                          </span>
+                        ))}
+                        <span>· Threads: {iss.group.thread_ids.join(", ") || "-"}</span>
+                      </div>
+                      {f.human_review_required && (
+                        <span className="font-medium text-amber-700 dark:text-amber-300">Human Review Flagged</span>
+                      )}
+                    </div>
+                  </div>
+                );
+              })
+            )}
           </div>
-        </div>
+
+          {/* Desktop Table View */}
+          <div className="hidden md:block rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 shadow-xs overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[880px] text-left border-collapse text-sm">
+                <thead>
+                  <tr className="bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-600 dark:bg-slate-800/70 dark:border-slate-800 dark:text-slate-400 uppercase tracking-wider">
+                    <th className="py-3 px-4">#</th>
+                    <th className="py-3 px-4">Issue / Booking</th>
+                    <th className="py-3 px-4">Urgency</th>
+                    <th className="py-3 px-4">Department</th>
+                    <th className="py-3 px-4">Next Action &amp; Channel</th>
+                    <th className="py-3 px-4">Source IDs</th>
+                    <th className="py-3 px-4">Status &amp; Source</th>
+                    <th className="py-3 px-4 text-right">Inspect</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
+                  {issues.length === 0 ? (
+                    <tr>
+                      <td colSpan={8} className="py-8 text-center text-slate-500 dark:text-slate-400">
+                        No issues match the current filters.
+                      </td>
+                    </tr>
+                  ) : (
+                    issues.map((iss) => {
+                      const f = iss.final;
+                      return (
+                        <tr key={iss.issue_id} className="hover:bg-slate-50/70 dark:hover:bg-slate-800/50 align-top">
+                          <td className="py-3.5 px-4 font-bold text-slate-900 dark:text-slate-100 tabular-nums">
+                            {f.priority_rank ?? "-"}
+                          </td>
+                          <td className="py-3.5 px-4 whitespace-nowrap">
+                            <Link
+                              href={`/issues/${iss.issue_id}`}
+                              className="font-semibold text-slate-900 dark:text-slate-100 hover:underline"
+                            >
+                              {iss.issue_id}
+                            </Link>
+                            <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 font-mono">
+                              {iss.group.booking_id || "Unlinked"}
+                              {iss.booking?.locality ? ` · ${iss.booking.locality}` : ""}
+                            </div>
+                          </td>
+                          <td className="py-3.5 px-4 whitespace-nowrap">
+                            <UrgencyBadge urgency={f.urgency} />
+                            {f.deadline && (
+                              <div className="text-[11px] text-rose-700 dark:text-rose-400 font-medium mt-1">
+                                Deadline: {f.deadline}
+                              </div>
+                            )}
+                          </td>
+                          <td className="py-3.5 px-4 whitespace-nowrap">
+                            <DepartmentBadge department={f.responsible_department} />
+                            {f.supporting_departments.length > 0 && (
+                              <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
+                                + {f.supporting_departments.join(", ")}
+                              </div>
+                            )}
+                          </td>
+                          <td className="py-3.5 px-4 max-w-md">
+                            <div className="flex flex-wrap items-center gap-1.5 mb-1">
+                              <ChannelBadge channel={f.contact_channel} />
+                              <code className="text-[11px] text-slate-500 dark:text-slate-400 font-mono break-all">{f.action_code}</code>
+                            </div>
+                            <div className="text-slate-800 dark:text-slate-200 text-xs leading-relaxed">{f.next_action}</div>
+                            {f.missing_information.length > 0 && (
+                              <div className="mt-1 text-[11px] text-amber-800 dark:text-amber-300">
+                                Missing: {f.missing_information[0]}
+                                {f.missing_information.length > 1 ? ` (+${f.missing_information.length - 1})` : ""}
+                              </div>
+                            )}
+                          </td>
+                          <td className="py-3.5 px-4 whitespace-nowrap">
+                            <div className="flex flex-wrap gap-1">
+                              {iss.group.source_message_ids.map((mid) => (
+                                <span
+                                  key={mid}
+                                  className="px-1.5 py-0.5 rounded bg-slate-100 border border-slate-200 dark:bg-slate-800 dark:border-slate-700 font-mono text-xs text-slate-700 dark:text-slate-200"
+                                >
+                                  {mid}
+                                </span>
+                              ))}
+                            </div>
+                            <div className="text-[11px] text-slate-400 dark:text-slate-500 mt-1">
+                              Threads: {iss.group.thread_ids.join(", ") || "-"}
+                            </div>
+                          </td>
+                          <td className="py-3.5 px-4 whitespace-nowrap space-y-1">
+                            <div>
+                              <StatusBadge status={f.status} />
+                            </div>
+                            <div>
+                              <SourceBadge source={f.source} />
+                            </div>
+                            {f.human_review_required && (
+                              <div className="text-[11px] font-medium text-amber-700 dark:text-amber-300">Human Review Flagged</div>
+                            )}
+                          </td>
+                          <td className="py-3.5 px-4 text-right whitespace-nowrap">
+                            <Link
+                              href={`/issues/${iss.issue_id}`}
+                              className="inline-flex items-center px-2.5 py-1 rounded-lg bg-slate-900 text-white text-xs font-medium hover:bg-slate-800 dark:bg-sky-500 dark:text-slate-950 dark:hover:bg-sky-400"
+                            >
+                              Review
+                            </Link>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </>
       )}
     </div>
   );

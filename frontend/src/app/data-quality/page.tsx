@@ -98,12 +98,12 @@ export default function DataQualityPage() {
 
       {/* Upload cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <label className="rounded-xl border border-dashed border-slate-300 bg-white hover:border-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:hover:border-slate-500 p-4 cursor-pointer flex items-center justify-between">
-          <div>
+        <label className="rounded-xl border border-dashed border-slate-300 bg-white hover:border-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:hover:border-slate-500 p-4 cursor-pointer flex flex-wrap sm:flex-nowrap items-center justify-between gap-3">
+          <div className="min-w-0">
             <div className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-              <Upload className="w-4 h-4 text-slate-600 dark:text-slate-400" /> Upload booking_register.csv
+              <Upload className="w-4 h-4 text-slate-600 dark:text-slate-400 shrink-0" /> Upload booking_register.csv
             </div>
-            <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 break-words">
               Current rows: {data?.files["booking_register.csv"]?.rows ?? "-"} · Max 256 KB · UTF-8 / BOM supported
             </div>
           </div>
@@ -114,15 +114,15 @@ export default function DataQualityPage() {
             className="hidden"
             onChange={(e) => handleUpload("bookings", e.target.files?.[0])}
           />
-          <span className="px-3 py-1.5 rounded-lg bg-slate-900 text-white dark:bg-sky-500 dark:text-slate-950 text-xs font-medium">Choose CSV</span>
+          <span className="px-3 py-1.5 rounded-lg bg-slate-900 text-white dark:bg-sky-500 dark:text-slate-950 text-xs font-medium shrink-0">Choose CSV</span>
         </label>
 
-        <label className="rounded-xl border border-dashed border-slate-300 bg-white hover:border-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:hover:border-slate-500 p-4 cursor-pointer flex items-center justify-between">
-          <div>
+        <label className="rounded-xl border border-dashed border-slate-300 bg-white hover:border-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:hover:border-slate-500 p-4 cursor-pointer flex flex-wrap sm:flex-nowrap items-center justify-between gap-3">
+          <div className="min-w-0">
             <div className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-              <Upload className="w-4 h-4 text-slate-600 dark:text-slate-400" /> Upload shift_inbox.csv
+              <Upload className="w-4 h-4 text-slate-600 dark:text-slate-400 shrink-0" /> Upload shift_inbox.csv
             </div>
-            <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 break-words">
               Current rows: {data?.files["shift_inbox.csv"]?.rows ?? "-"} · Max 256 KB · Re-runs deterministic triage
             </div>
           </div>
@@ -133,7 +133,7 @@ export default function DataQualityPage() {
             className="hidden"
             onChange={(e) => handleUpload("inbox", e.target.files?.[0])}
           />
-          <span className="px-3 py-1.5 rounded-lg bg-slate-900 text-white dark:bg-sky-500 dark:text-slate-950 text-xs font-medium">Choose CSV</span>
+          <span className="px-3 py-1.5 rounded-lg bg-slate-900 text-white dark:bg-sky-500 dark:text-slate-950 text-xs font-medium shrink-0">Choose CSV</span>
         </label>
       </div>
 
@@ -141,7 +141,7 @@ export default function DataQualityPage() {
         <LoadingPanel />
       ) : (
         <>
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
             <StatCard label="Total Findings" value={data.summary.total} />
             <StatCard label="Errors" value={data.summary.error} tone={data.summary.error > 0 ? "danger" : "default"} />
             <StatCard label="Warnings" value={data.summary.warning} tone={data.summary.warning > 0 ? "warning" : "default"} />
@@ -165,7 +165,7 @@ export default function DataQualityPage() {
               </select>
             </div>
             <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse text-xs">
+              <table className="w-full min-w-[780px] text-left border-collapse text-xs">
                 <thead>
                   <tr className="border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 uppercase">
                     <th className="py-2.5 px-4">File</th>

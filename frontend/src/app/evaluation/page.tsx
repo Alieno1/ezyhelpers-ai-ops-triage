@@ -70,7 +70,7 @@ export default function EvaluationPage() {
   }));
 
   const gridColor = isDark ? "#334155" : "#e2e8f0";
-  const axisTick = { fontSize: 12, fill: isDark ? "#94a3b8" : "#475569" };
+  const axisTick = { fontSize: 11, fill: isDark ? "#94a3b8" : "#475569" };
   const tooltipStyle = isDark
     ? { backgroundColor: "#0f172a", borderColor: "#334155", color: "#f1f5f9", fontSize: 12 }
     : { backgroundColor: "#ffffff", borderColor: "#e2e8f0", color: "#0f172a", fontSize: 12 };
@@ -78,18 +78,18 @@ export default function EvaluationPage() {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
+        <div className="min-w-0">
           <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100">Rules vs AI Evaluation</h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400">
+          <p className="text-sm text-slate-500 dark:text-slate-400 break-words">
             Scored against frozen <code className="font-mono">{report.expected_file}</code> ({report.total_cases} cases).
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
             disabled={running}
             onClick={() => handleRun(false)}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900 text-white text-xs font-medium hover:bg-slate-800 dark:bg-sky-500 dark:text-slate-950 dark:hover:bg-sky-400 disabled:opacity-50"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900 text-white text-xs font-medium hover:bg-slate-800 dark:bg-sky-500 dark:text-slate-950 dark:hover:bg-sky-400 disabled:opacity-50 cursor-pointer"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${running ? "animate-spin" : ""}`} />
             Rerun Rules Comparison
@@ -99,7 +99,7 @@ export default function EvaluationPage() {
             disabled={running || !keyConfigured}
             title={keyConfigured ? "Evaluate live OpenRouter model" : "Set OPENROUTER_API_KEY in backend/.env to run live AI evaluation"}
             onClick={() => handleRun(true)}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 disabled:opacity-50"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 disabled:opacity-50 cursor-pointer"
           >
             <FlaskConical className="w-3.5 h-3.5" />
             {keyConfigured ? "Evaluate Live AI" : "Live AI (Key Pending)"}
@@ -110,14 +110,14 @@ export default function EvaluationPage() {
       {/* Method Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
         {report.methods.map((m) => (
-          <div key={m.variant} className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-4 shadow-xs space-y-2.5">
+          <div key={m.variant} className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-4 shadow-xs space-y-2.5 min-w-0">
             <div className="flex items-start justify-between gap-2">
-              <div>
-                <div className="text-xs font-mono text-slate-500 dark:text-slate-400">{m.variant}</div>
-                <div className="text-sm font-bold text-slate-900 dark:text-slate-100">{m.label}</div>
+              <div className="min-w-0">
+                <div className="text-xs font-mono text-slate-500 dark:text-slate-400 break-words">{m.variant}</div>
+                <div className="text-sm font-bold text-slate-900 dark:text-slate-100 break-words">{m.label}</div>
               </div>
               <span
-                className={`px-2 py-0.5 rounded text-[11px] font-semibold uppercase ${m.status === "evaluated"
+                className={`px-2 py-0.5 rounded text-[11px] font-semibold uppercase shrink-0 ${m.status === "evaluated"
                   ? "bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/70 dark:text-emerald-300 dark:border-emerald-800"
                   : "bg-amber-50 text-amber-800 border border-amber-200 dark:bg-amber-950/70 dark:text-amber-300 dark:border-amber-800"
                   }`}
@@ -130,13 +130,13 @@ export default function EvaluationPage() {
               <div className="grid grid-cols-2 gap-2 pt-1 text-xs">
                 <div className="bg-slate-50 rounded p-2 border border-slate-100 dark:bg-slate-800/70 dark:border-slate-700">
                   <div className="text-slate-500 dark:text-slate-400">Next Actions</div>
-                  <div className="text-lg font-bold text-slate-900 dark:text-slate-100">
+                  <div className="text-lg font-bold text-slate-900 dark:text-slate-100 tabular-nums">
                     {m.correct_next_actions}/{m.total_cases}
                   </div>
                 </div>
                 <div className="bg-slate-50 rounded p-2 border border-slate-100 dark:bg-slate-800/70 dark:border-slate-700">
                   <div className="text-slate-500 dark:text-slate-400">Unsupported Promises</div>
-                  <div className={`text-lg font-bold ${m.unsupported_promises === 0 ? "text-emerald-700 dark:text-emerald-400" : "text-red-700 dark:text-red-400"}`}>
+                  <div className={`text-lg font-bold tabular-nums ${m.unsupported_promises === 0 ? "text-emerald-700 dark:text-emerald-400" : "text-red-700 dark:text-red-400"}`}>
                     {m.unsupported_promises}
                   </div>
                 </div>
@@ -148,10 +148,10 @@ export default function EvaluationPage() {
                   <strong>{m.first_callback_correct === null ? "-" : m.first_callback_correct ? "Match" : "Mismatch"}</strong>
                 </div>
                 {m.mode === "ai" && (
-                  <div className="col-span-2 pt-1.5 border-t border-slate-100 dark:border-slate-800 text-[11px] text-slate-500 dark:text-slate-400">
-                    Tokens: <strong>{m.token_usage_total ?? "-"}</strong> ·{" "}
-                    Latency: <strong>{m.duration_ms_total ? `${(m.duration_ms_total / 1000).toFixed(1)}s` : "-"}</strong> ·{" "}
-                    Cost: <strong>{m.actual_cost_usd !== null ? `$${m.actual_cost_usd.toFixed(6)}` : "n/a"}</strong>
+                  <div className="col-span-2 pt-1.5 border-t border-slate-100 dark:border-slate-800 text-[11px] text-slate-500 dark:text-slate-400 flex flex-wrap gap-x-2 gap-y-0.5">
+                    <span>Tokens: <strong>{m.token_usage_total ?? "-"}</strong></span>
+                    <span>Latency: <strong>{m.duration_ms_total ? `${(m.duration_ms_total / 1000).toFixed(1)}s` : "-"}</strong></span>
+                    <span>Cost: <strong>{m.actual_cost_usd !== null ? `$${m.actual_cost_usd.toFixed(6)}` : "n/a"}</strong></span>
                   </div>
                 )}
               </div>
@@ -166,9 +166,9 @@ export default function EvaluationPage() {
 
       {/* Before / After Improvement & Chart */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        <div className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-5 shadow-xs space-y-3">
+        <div className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-5 shadow-xs space-y-3 min-w-0">
           <div className="text-xs font-semibold text-indigo-700 dark:text-sky-400 uppercase tracking-wider">
-            Single Targeted Improvement & Rerun
+            Single Targeted Improvement &amp; Rerun
           </div>
           <div className="text-lg font-bold text-slate-900 dark:text-slate-100">
             {report.improvement_summary.before_variant}: {report.improvement_summary.before_correct}/{report.improvement_summary.total}{" "}
@@ -180,21 +180,21 @@ export default function EvaluationPage() {
             <div className="space-y-1.5 pt-2">
               <div className="text-xs font-semibold text-slate-700 dark:text-slate-200">Recorded Failures / Disagreements:</div>
               {report.disagreements_and_failures.map((d, idx) => (
-                <div key={idx} className="text-xs rounded bg-rose-50 border border-rose-200 dark:bg-rose-950/40 dark:border-rose-900 p-2.5 text-rose-900 dark:text-rose-200">
+                <div key={idx} className="text-xs rounded bg-rose-50 border border-rose-200 dark:bg-rose-950/40 dark:border-rose-900 p-2.5 text-rose-900 dark:text-rose-200 break-words">
                   <strong>[{d.variant}] {d.source_message_ids.join(", ")} ({d.booking_id || "Unlinked"}):</strong>{" "}
-                  Expected <code>{d.expected}</code>, got <code>{d.actual}</code>.
+                  Expected <code className="break-words">{d.expected}</code>, got <code className="break-words">{d.actual}</code>.
                 </div>
               ))}
             </div>
           )}
         </div>
 
-        <div className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-5 shadow-xs">
+        <div className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-5 shadow-xs min-w-0">
           <div className="text-sm font-bold text-slate-900 dark:text-slate-100 mb-3">Before vs After Metric Comparison</div>
           <div className="h-56 w-full">
             {mounted && (
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={chartData}>
+                <BarChart data={chartData} margin={{ top: 4, right: 8, left: -16, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
                   <XAxis dataKey="name" tick={axisTick} />
                   <YAxis allowDecimals={false} tick={axisTick} />
@@ -212,12 +212,12 @@ export default function EvaluationPage() {
 
       {/* Case-by-case matrix */}
       <div className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 shadow-xs overflow-hidden">
-        <div className="px-4 py-3 border-b border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-800/70 flex items-center justify-between">
+        <div className="px-4 py-3 border-b border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-800/70 flex flex-wrap items-center justify-between gap-2">
           <h2 className="text-sm font-bold text-slate-900 dark:text-slate-100">Case-by-Case Expected vs Actual Matrix</h2>
           <span className="text-xs text-slate-500 dark:text-slate-400">Human Corrections Logged: {report.human_corrections_count}</span>
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse text-xs">
+          <table className="w-full min-w-[760px] text-left border-collapse text-xs">
             <thead>
               <tr className="border-b border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-800/70 text-slate-600 dark:text-slate-400 uppercase">
                 <th className="py-2.5 px-4">Source IDs</th>

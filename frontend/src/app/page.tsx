@@ -14,6 +14,8 @@ import {
   StatCard,
   SuccessBanner,
   UrgencyBadge,
+  formatRunStatus,
+  formatShortTime,
 } from "@/components/ui";
 import { getOverview, resetDataset, runAiPipeline, runRulesPipeline } from "@/lib/api";
 import type { OverviewResponse } from "@/lib/types";
@@ -116,7 +118,7 @@ export default function OverviewPage() {
   const m = data.metrics;
   const fc = data.first_callback;
   const gridColor = isDark ? "#334155" : "#e2e8f0";
-  const axisTick = { fontSize: 12, fill: isDark ? "#94a3b8" : "#475569" };
+  const axisTick = { fontSize: 11, fill: isDark ? "#94a3b8" : "#475569" };
   const tooltipStyle = isDark
     ? { backgroundColor: "#0f172a", borderColor: "#334155", color: "#f1f5f9", fontSize: 12 }
     : { backgroundColor: "#ffffff", borderColor: "#e2e8f0", color: "#0f172a", fontSize: 12 };
@@ -125,11 +127,20 @@ export default function OverviewPage() {
     <div className="space-y-6">
       {/* Header & Controls */}
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
+        <div className="min-w-0">
           <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100">Shift Triage Overview</h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400">
-            Active Run: <code className="font-mono text-slate-700 dark:text-slate-300">{data.run_id}</code> · Variant:{" "}
-            <strong className="text-slate-700 dark:text-slate-200">{data.variant}</strong> · Status: {data.run_status}
+          <p className="text-sm text-slate-500 dark:text-slate-400 flex flex-wrap items-center gap-x-2 gap-y-0.5">
+            <span>
+              Active Run: <code className="font-mono text-slate-700 dark:text-slate-300">{data.run_id}</code>
+            </span>
+            <span>·</span>
+            <span>
+              Variant: <strong className="text-slate-700 dark:text-slate-200">{data.variant}</strong>
+            </span>
+            <span>·</span>
+            <span>
+              Status: <strong className="text-slate-700 dark:text-slate-200">{formatRunStatus(data.run_status)}</strong>
+            </span>
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -137,7 +148,7 @@ export default function OverviewPage() {
             type="button"
             disabled={busy}
             onClick={() => triggerRules("v1")}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 disabled:opacity-50"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 disabled:opacity-50 cursor-pointer"
           >
             <Play className="w-3.5 h-3.5" /> Rules v1 (Baseline)
           </button>
@@ -145,7 +156,7 @@ export default function OverviewPage() {
             type="button"
             disabled={busy}
             onClick={() => triggerRules("v2")}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900 text-white text-xs font-medium hover:bg-slate-800 dark:bg-sky-500 dark:text-slate-950 dark:hover:bg-sky-400 disabled:opacity-50"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900 text-white text-xs font-medium hover:bg-slate-800 dark:bg-sky-500 dark:text-slate-950 dark:hover:bg-sky-400 disabled:opacity-50 cursor-pointer"
           >
             <Play className="w-3.5 h-3.5" /> Rules v2 (Improved)
           </button>
@@ -153,7 +164,7 @@ export default function OverviewPage() {
             type="button"
             disabled={busy}
             onClick={triggerAi}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-violet-300 bg-violet-50 text-xs font-medium text-violet-800 hover:bg-violet-100 dark:border-violet-800 dark:bg-violet-950/60 dark:text-violet-300 dark:hover:bg-violet-900/60 disabled:opacity-50"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-violet-300 bg-violet-50 text-xs font-medium text-violet-800 hover:bg-violet-100 dark:border-violet-800 dark:bg-violet-950/60 dark:text-violet-300 dark:hover:bg-violet-900/60 disabled:opacity-50 cursor-pointer"
           >
             <Cpu className="w-3.5 h-3.5" />
             {data.openrouter_configured ? "Run OpenRouter AI" : "Run AI (Fallback Check)"}
@@ -162,7 +173,7 @@ export default function OverviewPage() {
             type="button"
             disabled={busy}
             onClick={triggerReset}
-            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 disabled:opacity-50"
+            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 disabled:opacity-50 cursor-pointer"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${busy ? "animate-spin" : ""}`} /> Reset
           </button>
@@ -174,28 +185,28 @@ export default function OverviewPage() {
 
       {/* First Callback Hero Card */}
       {fc ? (
-        <section className="rounded-xl border-2 border-red-200 bg-white dark:border-red-900/80 dark:bg-slate-900 p-5 shadow-xs space-y-3">
+        <section className="rounded-xl border-2 border-red-200 bg-white dark:border-red-900/80 dark:bg-slate-900 p-4 sm:p-5 shadow-xs space-y-3">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-lg bg-red-600 text-white flex items-center justify-center">
+            <div className="flex items-start sm:items-center gap-2.5 min-w-0">
+              <div className="w-9 h-9 shrink-0 rounded-lg bg-red-600 text-white flex items-center justify-center">
                 <PhoneCall className="w-5 h-5" />
               </div>
-              <div>
+              <div className="min-w-0">
                 <div className="text-xs font-bold text-red-700 dark:text-red-400 uppercase tracking-wider">
                   Who Gets the First Callback (#1 in Queue)
                 </div>
-                <div className="text-lg font-bold text-slate-900 dark:text-slate-100">
+                <div className="text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100 break-words">
                   {fc.issue_id} · Booking {fc.booking_id || "Unlinked"} ({fc.source_message_ids.join(", ")})
                 </div>
               </div>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <UrgencyBadge urgency={fc.urgency} />
               <DepartmentBadge department={fc.department} />
               <ChannelBadge channel={fc.channel} />
               <Link
                 href={`/issues/${fc.issue_id}`}
-                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-600 text-white text-xs font-semibold hover:bg-red-700"
+                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-600 text-white text-xs font-semibold hover:bg-red-700 shrink-0"
               >
                 Inspect Evidence <ArrowRight className="w-3.5 h-3.5" />
               </Link>
@@ -203,13 +214,13 @@ export default function OverviewPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1 text-xs">
-            <div className="rounded-lg bg-red-50/50 border border-red-100 dark:bg-red-950/30 dark:border-red-900/60 p-3 space-y-1">
+            <div className="rounded-lg bg-red-50/50 border border-red-100 dark:bg-red-950/30 dark:border-red-900/60 p-3 space-y-1 min-w-0">
               <div className="font-semibold text-red-900 dark:text-red-300">Why #1 Before Any Other Case</div>
-              <div className="text-slate-800 dark:text-slate-200 leading-relaxed">{fc.why_first}</div>
+              <div className="text-slate-800 dark:text-slate-200 leading-relaxed break-words">{fc.why_first}</div>
             </div>
-            <div className="rounded-lg bg-slate-50 border border-slate-200 dark:bg-slate-800/70 dark:border-slate-700 p-3 space-y-1">
+            <div className="rounded-lg bg-slate-50 border border-slate-200 dark:bg-slate-800/70 dark:border-slate-700 p-3 space-y-1 min-w-0">
               <div className="font-semibold text-slate-900 dark:text-slate-100">Immediate Coordinator Next Action</div>
-              <div className="text-slate-800 dark:text-slate-200 leading-relaxed">{fc.next_action}</div>
+              <div className="text-slate-800 dark:text-slate-200 leading-relaxed break-words">{fc.next_action}</div>
             </div>
           </div>
         </section>
@@ -220,7 +231,7 @@ export default function OverviewPage() {
       )}
 
       {/* 8 KPI Metrics */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
         <StatCard label="Total Messages" value={m.total_messages} sub={`Across ${m.total_bookings} bookings`} />
         <StatCard label="Distinct Issues" value={m.distinct_issues} sub="Grouped deterministically" />
         <StatCard
@@ -238,8 +249,8 @@ export default function OverviewPage() {
         />
         <StatCard
           label="Model Execution"
-          value={data.mode === "ai" ? data.run_status : "Rules-Only"}
-          sub={data.openrouter_configured ? "OpenRouter key set" : "OpenRouter key pending"}
+          value={data.mode === "ai" ? formatRunStatus(data.run_status) : "Rules-Only"}
+          sub={data.openrouter_configured ? `OpenRouter (${data.model || "ready"})` : "OpenRouter key pending"}
         />
         <StatCard
           label="Data-Quality Findings"
@@ -251,12 +262,12 @@ export default function OverviewPage() {
 
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        <div className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-5 shadow-xs">
+        <div className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-5 shadow-xs min-w-0">
           <h2 className="text-sm font-bold text-slate-900 dark:text-slate-100 mb-3">Issues by Urgency Tier</h2>
           <div className="h-56 w-full">
             {mounted && (
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={data.urgency_breakdown}>
+                <BarChart data={data.urgency_breakdown} margin={{ top: 4, right: 8, left: -16, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
                   <XAxis dataKey="urgency" tick={axisTick} />
                   <YAxis allowDecimals={false} tick={axisTick} />
@@ -272,12 +283,12 @@ export default function OverviewPage() {
           </div>
         </div>
 
-        <div className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-5 shadow-xs">
+        <div className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-5 shadow-xs min-w-0">
           <h2 className="text-sm font-bold text-slate-900 dark:text-slate-100 mb-3">Owning Department Distribution</h2>
           <div className="h-56 w-full">
             {mounted && (
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={data.department_breakdown}>
+                <BarChart data={data.department_breakdown} margin={{ top: 4, right: 8, left: -16, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
                   <XAxis dataKey="department" tick={axisTick} />
                   <YAxis allowDecimals={false} tick={axisTick} />
@@ -292,21 +303,21 @@ export default function OverviewPage() {
 
       {/* Run Notes & Recent Runs */}
       <div className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-5 shadow-xs space-y-3">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <h2 className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-            <ShieldAlert className="w-4 h-4 text-slate-600 dark:text-slate-400" /> Execution Notes & Recent Runs
+            <ShieldAlert className="w-4 h-4 text-slate-600 dark:text-slate-400 shrink-0" /> Execution Notes &amp; Recent Runs
           </h2>
           <Link href="/queue" className="text-xs font-medium text-slate-700 dark:text-sky-400 underline hover:text-slate-900 dark:hover:text-sky-300">
             Open Full Priority Queue &rarr;
           </Link>
         </div>
-        <div className="text-xs text-slate-600 dark:text-slate-400 space-y-1">
+        <div className="text-xs text-slate-600 dark:text-slate-400 space-y-1 break-words">
           {data.notes.map((n, i) => (
             <div key={i}>• {n}</div>
           ))}
         </div>
         <div className="overflow-x-auto border border-slate-200 dark:border-slate-800 rounded-lg">
-          <table className="w-full text-left border-collapse text-xs">
+          <table className="w-full min-w-[640px] text-left border-collapse text-xs">
             <thead>
               <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 dark:bg-slate-800/70 dark:border-slate-800 dark:text-slate-400 uppercase">
                 <th className="py-2 px-3">Run ID</th>
@@ -320,12 +331,12 @@ export default function OverviewPage() {
             <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
               {data.recent_runs.map((r) => (
                 <tr key={r.run_id}>
-                  <td className="py-2 px-3 font-mono">{r.run_id}</td>
-                  <td className="py-2 px-3">{r.mode}</td>
-                  <td className="py-2 px-3 font-mono">{r.variant}</td>
-                  <td className="py-2 px-3 font-mono">{r.model || "-"}</td>
-                  <td className="py-2 px-3">{r.status}</td>
-                  <td className="py-2 px-3 font-mono text-slate-500 dark:text-slate-400">{r.finished_at}</td>
+                  <td className="py-2 px-3 font-mono whitespace-nowrap">{r.run_id}</td>
+                  <td className="py-2 px-3 whitespace-nowrap">{r.mode}</td>
+                  <td className="py-2 px-3 font-mono whitespace-nowrap">{r.variant}</td>
+                  <td className="py-2 px-3 font-mono whitespace-nowrap">{r.model || "-"}</td>
+                  <td className="py-2 px-3 whitespace-nowrap">{formatRunStatus(r.status)}</td>
+                  <td className="py-2 px-3 font-mono text-slate-500 dark:text-slate-400 whitespace-nowrap">{formatShortTime(r.finished_at)}</td>
                 </tr>
               ))}
             </tbody>

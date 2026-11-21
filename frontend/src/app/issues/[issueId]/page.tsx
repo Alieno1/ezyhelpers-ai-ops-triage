@@ -23,6 +23,7 @@ import {
   StatusBadge,
   SuccessBanner,
   UrgencyBadge,
+  formatShortTime,
 } from "@/components/ui";
 import { getIssueDetail, submitReview } from "@/lib/api";
 import type { DQIssue, IssueResult, Recommendation, ReviewRecord } from "@/lib/types";
@@ -140,14 +141,14 @@ export default function IssueDetailPage() {
   return (
     <div className="space-y-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
+        <div className="flex items-start sm:items-center gap-3 min-w-0">
           <Link
             href="/queue"
-            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 shrink-0"
           >
             <ArrowLeft className="w-3.5 h-3.5" /> Queue
           </Link>
-          <div>
+          <div className="min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100">
                 #{f.priority_rank} · {issue.issue_id}
@@ -157,28 +158,30 @@ export default function IssueDetailPage() {
               <StatusBadge status={f.status} />
               <SourceBadge source={f.source} />
             </div>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 break-words">
               Booking: <span className="font-mono font-semibold">{issue.group.booking_id || "Unlinked"}</span> · Messages:{" "}
               <span className="font-mono">{issue.group.source_message_ids.join(", ")}</span>
-              {runMeta && <span className="ml-2">· Run {runMeta.run_id}</span>}
+              {runMeta && <span className="ml-0 sm:ml-2 block sm:inline">· Run {runMeta.run_id}</span>}
             </p>
           </div>
         </div>
-        <ChannelBadge channel={f.contact_channel} />
+        <div className="shrink-0">
+          <ChannelBadge channel={f.contact_channel} />
+        </div>
       </div>
 
       {/* Priority Rationale Banner */}
       <div className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-4 shadow-xs">
         <div className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Priority Rationale</div>
-        <div className="mt-1 text-sm text-slate-900 dark:text-slate-100 font-medium">{f.priority_reason}</div>
+        <div className="mt-1 text-sm text-slate-900 dark:text-slate-100 font-medium break-words">{f.priority_reason}</div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         {/* Left 2 cols: Evidence, Timeline, Recommendations */}
-        <div className="lg:col-span-2 space-y-5">
+        <div className="lg:col-span-2 space-y-5 min-w-0">
           {/* Message Timeline */}
           <section className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-5 shadow-xs space-y-3">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-wrap items-center justify-between gap-2">
               <h2 className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
                 <MessageCircle className="w-4 h-4 text-slate-600 dark:text-slate-400" />
                 Chronological Message Timeline ({issue.messages.length})
@@ -333,24 +336,24 @@ export default function IssueDetailPage() {
                   <UrgencyBadge urgency={activeRec.urgency} />
                   <DepartmentBadge department={activeRec.responsible_department} />
                   <ChannelBadge channel={activeRec.contact_channel} />
-                  <code className="text-xs bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded font-mono text-slate-700 dark:text-slate-200">
+                  <code className="text-xs bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded font-mono text-slate-700 dark:text-slate-200 break-all sm:break-words">
                     {activeRec.action_code}
                   </code>
                 </div>
                 <div>
                   <div className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Next Action</div>
-                  <div className="mt-0.5 text-slate-900 dark:text-slate-100">{activeRec.next_action}</div>
+                  <div className="mt-0.5 text-slate-900 dark:text-slate-100 break-words">{activeRec.next_action}</div>
                 </div>
                 <div>
                   <div className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Explanation</div>
-                  <div className="mt-0.5 text-xs text-slate-700 dark:text-slate-300">{activeRec.explanation}</div>
+                  <div className="mt-0.5 text-xs text-slate-700 dark:text-slate-300 break-words">{activeRec.explanation}</div>
                 </div>
 
                 {/* Draft Box */}
                 <div className="rounded-lg border border-amber-300 bg-amber-50/50 dark:border-amber-800 dark:bg-amber-950/30 p-3.5 space-y-2">
-                  <div className="flex items-center justify-between text-xs">
+                  <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
                     <span className="font-bold text-amber-900 dark:text-amber-300 flex items-center gap-1.5">
-                      <ShieldCheck className="w-4 h-4 text-amber-700 dark:text-amber-400" />
+                      <ShieldCheck className="w-4 h-4 text-amber-700 dark:text-amber-400 shrink-0" />
                       DRAFT ONLY — NOT SENT AUTOMATICALLY
                     </span>
                     <span className="text-amber-700 dark:text-amber-400">Coordinator approval required</span>
@@ -539,8 +542,8 @@ export default function IssueDetailPage() {
                       <span>{r.action}</span>
                       <span className="text-slate-500 dark:text-slate-400 font-normal">{r.reviewer}</span>
                     </div>
-                    {r.reason && <div className="text-slate-700 dark:text-slate-300">Reason: {r.reason}</div>}
-                    <div className="text-[11px] text-slate-400 dark:text-slate-500 font-mono">{r.created_at}</div>
+                    {r.reason && <div className="text-slate-700 dark:text-slate-300 break-words">Reason: {r.reason}</div>}
+                    <div className="text-[11px] text-slate-400 dark:text-slate-500 font-mono">{formatShortTime(r.created_at)}</div>
                   </div>
                 ))}
               </div>

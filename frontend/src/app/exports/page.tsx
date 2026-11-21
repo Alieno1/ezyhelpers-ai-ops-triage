@@ -32,15 +32,17 @@ export default function ExportsAndModelPage() {
 
       {/* Exports Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-5 shadow-xs space-y-3">
-          <div className="flex items-center gap-2 font-bold text-slate-900 dark:text-slate-100 text-sm">
-            <FileSpreadsheet className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-            Priority Queue ({dataset})
+        <div className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-5 shadow-xs flex flex-col justify-between gap-4 min-w-0">
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 font-bold text-slate-900 dark:text-slate-100 text-sm">
+              <FileSpreadsheet className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+              Priority Queue ({dataset})
+            </div>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              Ranked issues with source IDs, departments, next actions, missing info, drafts, and human corrections.
+            </p>
           </div>
-          <p className="text-xs text-slate-500 dark:text-slate-400">
-            Ranked issues with source IDs, departments, next actions, missing info, drafts, and human corrections.
-          </p>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <a
               href={exportUrl("queue", "csv", dataset)}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900 text-white text-xs font-medium hover:bg-slate-800 dark:bg-sky-500 dark:text-slate-950 dark:hover:bg-sky-400"
@@ -56,15 +58,17 @@ export default function ExportsAndModelPage() {
           </div>
         </div>
 
-        <div className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-5 shadow-xs space-y-3">
-          <div className="flex items-center gap-2 font-bold text-slate-900 dark:text-slate-100 text-sm">
-            <FileSpreadsheet className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-            Evaluation Results
+        <div className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-5 shadow-xs flex flex-col justify-between gap-4 min-w-0">
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 font-bold text-slate-900 dark:text-slate-100 text-sm">
+              <FileSpreadsheet className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
+              Evaluation Results
+            </div>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              Rules v1 vs Rules v2 before-and-after comparison, failure logs, and harder synthetic benchmark.
+            </p>
           </div>
-          <p className="text-xs text-slate-500 dark:text-slate-400">
-            Rules v1 vs Rules v2 before-and-after comparison, failure logs, and harder synthetic benchmark.
-          </p>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <a
               href={exportUrl("evaluation", "csv", dataset)}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900 text-white text-xs font-medium hover:bg-slate-800 dark:bg-sky-500 dark:text-slate-950 dark:hover:bg-sky-400"
@@ -80,15 +84,17 @@ export default function ExportsAndModelPage() {
           </div>
         </div>
 
-        <div className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-5 shadow-xs space-y-3">
-          <div className="flex items-center gap-2 font-bold text-slate-900 dark:text-slate-100 text-sm">
-            <FileText className="w-4 h-4 text-sky-600 dark:text-sky-400" />
-            Issue Evidence Report
+        <div className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-5 shadow-xs flex flex-col justify-between gap-4 min-w-0">
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 font-bold text-slate-900 dark:text-slate-100 text-sm">
+              <FileText className="w-4 h-4 text-sky-600 dark:text-sky-400 shrink-0" />
+              Issue Evidence Report
+            </div>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              Full shift triage narrative with message timelines, missing facts, and draft replies.
+            </p>
           </div>
-          <p className="text-xs text-slate-500 dark:text-slate-400">
-            Full shift triage narrative with message timelines, missing facts, and draft replies.
-          </p>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <a
               href={exportUrl("issues-report", "md", dataset)}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900 text-white text-xs font-medium hover:bg-slate-800 dark:bg-sky-500 dark:text-slate-950 dark:hover:bg-sky-400"
@@ -113,7 +119,7 @@ export default function ExportsAndModelPage() {
         <div className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-5 shadow-xs space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <h2 className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-              <Activity className="w-4 h-4 text-slate-700 dark:text-slate-300" /> OpenRouter Provider Configuration
+              <Activity className="w-4 h-4 text-slate-700 dark:text-slate-300 shrink-0" /> OpenRouter Provider Configuration
             </h2>
             <span
               className={`px-2.5 py-0.5 rounded-full text-xs font-semibold border ${
@@ -126,24 +132,24 @@ export default function ExportsAndModelPage() {
             </span>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs bg-slate-50 rounded-lg border border-slate-200 dark:bg-slate-800/70 dark:border-slate-700 p-3.5">
-            <div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs bg-slate-50 rounded-lg border border-slate-200 dark:bg-slate-800/70 dark:border-slate-700 p-3.5">
+            <div className="min-w-0">
               <div className="text-slate-500 dark:text-slate-400">Provider / Model</div>
-              <div className="font-mono font-semibold text-slate-900 dark:text-slate-100 mt-0.5">{status.model}</div>
+              <div className="font-mono font-semibold text-slate-900 dark:text-slate-100 mt-0.5 break-words">{status.model}</div>
             </div>
-            <div>
+            <div className="min-w-0">
               <div className="text-slate-500 dark:text-slate-400">Base URL</div>
               <div className="font-mono text-slate-800 dark:text-slate-200 mt-0.5 truncate">{status.base_url}</div>
             </div>
-            <div>
+            <div className="min-w-0">
               <div className="text-slate-500 dark:text-slate-400">Timeout / Retries</div>
               <div className="font-mono text-slate-800 dark:text-slate-200 mt-0.5">
                 {status.timeout_seconds}s / {status.max_retries} retries
               </div>
             </div>
-            <div>
+            <div className="min-w-0">
               <div className="text-slate-500 dark:text-slate-400">Pricing Assumption (1M tok)</div>
-              <div className="font-mono text-slate-800 dark:text-slate-200 mt-0.5">
+              <div className="font-mono text-slate-800 dark:text-slate-200 mt-0.5 break-words">
                 {status.pricing_assumptions_usd_per_1m.input !== null
                   ? `$${status.pricing_assumptions_usd_per_1m.input} in / $${status.pricing_assumptions_usd_per_1m.output} out`
                   : "Unset"}
@@ -156,7 +162,7 @@ export default function ExportsAndModelPage() {
               Recorded LLM Execution Log ({status.recent_calls.length} recent calls)
             </div>
             <div className="overflow-x-auto border border-slate-200 dark:border-slate-800 rounded-lg">
-              <table className="w-full text-left border-collapse text-xs">
+              <table className="w-full min-w-[780px] text-left border-collapse text-xs">
                 <thead>
                   <tr className="bg-slate-50 border-b border-slate-200 dark:bg-slate-800/70 dark:border-slate-800 text-slate-500 dark:text-slate-400 uppercase">
                     <th className="py-2 px-3">Call ID</th>
@@ -179,18 +185,18 @@ export default function ExportsAndModelPage() {
                   ) : (
                     status.recent_calls.map((c) => (
                       <tr key={c.call_id}>
-                        <td className="py-2 px-3 font-mono">{c.call_id}</td>
-                        <td className="py-2 px-3 font-mono">{c.issue_id || "-"}</td>
-                        <td className="py-2 px-3">
+                        <td className="py-2 px-3 font-mono whitespace-nowrap">{c.call_id}</td>
+                        <td className="py-2 px-3 font-mono whitespace-nowrap">{c.issue_id || "-"}</td>
+                        <td className="py-2 px-3 whitespace-nowrap">
                           <span className={c.ok ? "text-emerald-700 dark:text-emerald-400 font-semibold" : "text-red-700 dark:text-red-400 font-semibold"}>
                             {c.ok ? "OK" : "FAILED"}
                           </span>
                         </td>
-                        <td className="py-2 px-3 font-mono">{c.model_used || c.model_requested}</td>
-                        <td className="py-2 px-3 font-mono">{c.total_tokens ?? "-"}</td>
-                        <td className="py-2 px-3 font-mono">{c.cost_usd !== null ? `$${c.cost_usd.toFixed(6)}` : "-"}</td>
-                        <td className="py-2 px-3 font-mono">{c.duration_ms}ms</td>
-                        <td className="py-2 px-3 text-slate-600 dark:text-slate-300">{c.error_type ? `${c.error_type}: ${c.error_message}` : "-"}</td>
+                        <td className="py-2 px-3 font-mono break-words max-w-[220px]">{c.model_used || c.model_requested}</td>
+                        <td className="py-2 px-3 font-mono whitespace-nowrap">{c.total_tokens ?? "-"}</td>
+                        <td className="py-2 px-3 font-mono whitespace-nowrap">{c.cost_usd !== null ? `$${c.cost_usd.toFixed(6)}` : "-"}</td>
+                        <td className="py-2 px-3 font-mono whitespace-nowrap">{c.duration_ms}ms</td>
+                        <td className="py-2 px-3 text-slate-600 dark:text-slate-300 max-w-xs break-words">{c.error_type ? `${c.error_type}: ${c.error_message}` : "-"}</td>
                       </tr>
                     ))
                   )}

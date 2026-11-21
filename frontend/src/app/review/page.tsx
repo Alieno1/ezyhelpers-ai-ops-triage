@@ -13,6 +13,7 @@ import {
   StatusBadge,
   SuccessBanner,
   UrgencyBadge,
+  formatShortTime,
 } from "@/components/ui";
 import { getIssues, getReviews, submitReview } from "@/lib/api";
 import type { IssueResult, ReviewRecord } from "@/lib/types";
@@ -65,13 +66,13 @@ export default function HumanReviewPage() {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
+        <div className="min-w-0">
           <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100">Human Review Workbench</h1>
           <p className="text-sm text-slate-500 dark:text-slate-400">
             Verify source evidence, approve drafts, override priorities, and inspect all recorded human corrections.
           </p>
         </div>
-        <label className="inline-flex items-center gap-2 text-xs font-medium text-slate-700 bg-white border border-slate-300 dark:text-slate-200 dark:bg-slate-900 dark:border-slate-700 rounded-lg px-3 py-1.5 cursor-pointer">
+        <label className="inline-flex items-center gap-2 text-xs font-medium text-slate-700 bg-white border border-slate-300 dark:text-slate-200 dark:bg-slate-900 dark:border-slate-700 rounded-lg px-3 py-1.5 cursor-pointer shrink-0">
           <input type="checkbox" checked={showAll} onChange={(e) => setShowAll(e.target.checked)} />
           Include already-cleared issues
         </label>
@@ -86,7 +87,7 @@ export default function HumanReviewPage() {
         <>
           <section className="space-y-3">
             <h2 className="text-sm font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
-              <ClipboardCheck className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+              <ClipboardCheck className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
               {showAll ? `All Issues (${issues.length})` : `Flagged for Human Review (${issues.length})`}
             </h2>
             {issues.length === 0 ? (
@@ -100,8 +101,8 @@ export default function HumanReviewPage() {
                   return (
                     <div key={iss.issue_id} className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-4 shadow-xs space-y-2.5">
                       <div className="flex flex-wrap items-center justify-between gap-2">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span className="font-bold text-slate-900 dark:text-slate-100">#{f.priority_rank}</span>
+                        <div className="flex items-center gap-2 flex-wrap min-w-0">
+                          <span className="font-bold text-slate-900 dark:text-slate-100 tabular-nums">#{f.priority_rank}</span>
                           <Link href={`/issues/${iss.issue_id}`} className="font-bold text-slate-900 dark:text-slate-100 hover:underline">
                             {iss.issue_id}
                           </Link>
@@ -112,12 +113,12 @@ export default function HumanReviewPage() {
                           <StatusBadge status={f.status} />
                           <SourceBadge source={f.source} />
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-wrap items-center gap-2 shrink-0">
                           {f.human_review_required && (
                             <button
                               type="button"
                               onClick={() => quickApprove(iss.issue_id)}
-                              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-600 text-white text-xs font-medium hover:bg-emerald-700"
+                              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-600 text-white text-xs font-medium hover:bg-emerald-700 cursor-pointer"
                             >
                               <CheckCircle2 className="w-3.5 h-3.5" /> Quick Approve
                             </button>
@@ -130,9 +131,9 @@ export default function HumanReviewPage() {
                           </Link>
                         </div>
                       </div>
-                      <div className="text-xs text-slate-800 dark:text-slate-200">{f.next_action}</div>
+                      <div className="text-xs text-slate-800 dark:text-slate-200 break-words">{f.next_action}</div>
                       {f.human_review_reasons.length > 0 && (
-                        <div className="text-xs text-amber-800 bg-amber-50 dark:text-amber-200 dark:bg-amber-950/40 dark:border-amber-800 rounded px-2.5 py-1.5 border border-amber-200">
+                        <div className="text-xs text-amber-800 bg-amber-50 dark:text-amber-200 dark:bg-amber-950/40 dark:border-amber-800 rounded px-2.5 py-1.5 border border-amber-200 break-words">
                           {f.human_review_reasons.join(" · ")}
                         </div>
                       )}
@@ -145,10 +146,10 @@ export default function HumanReviewPage() {
 
           <section className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 shadow-xs overflow-hidden">
             <div className="px-4 py-3 border-b border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-800/70">
-              <h2 className="text-sm font-bold text-slate-900 dark:text-slate-100">Recorded Human Corrections & Approvals ({reviews.length})</h2>
+              <h2 className="text-sm font-bold text-slate-900 dark:text-slate-100">Recorded Human Corrections &amp; Approvals ({reviews.length})</h2>
             </div>
             <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse text-xs">
+              <table className="w-full min-w-[640px] text-left border-collapse text-xs">
                 <thead>
                   <tr className="border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 uppercase">
                     <th className="py-2.5 px-4">ID</th>
@@ -169,16 +170,16 @@ export default function HumanReviewPage() {
                   ) : (
                     reviews.map((r) => (
                       <tr key={r.review_id}>
-                        <td className="py-2.5 px-4 font-mono">#{r.review_id}</td>
-                        <td className="py-2.5 px-4 font-semibold">
+                        <td className="py-2.5 px-4 font-mono whitespace-nowrap">#{r.review_id}</td>
+                        <td className="py-2.5 px-4 font-semibold whitespace-nowrap">
                           <Link href={`/issues/${r.issue_id}`} className="hover:underline">
                             {r.issue_id}
                           </Link>
                         </td>
-                        <td className="py-2.5 px-4 font-mono">{r.action}</td>
-                        <td className="py-2.5 px-4">{r.reviewer}</td>
+                        <td className="py-2.5 px-4 font-mono whitespace-nowrap">{r.action}</td>
+                        <td className="py-2.5 px-4 whitespace-nowrap">{r.reviewer}</td>
                         <td className="py-2.5 px-4">{r.reason || "-"}</td>
-                        <td className="py-2.5 px-4 font-mono text-slate-500 dark:text-slate-400">{r.created_at}</td>
+                        <td className="py-2.5 px-4 font-mono text-slate-500 dark:text-slate-400 whitespace-nowrap">{formatShortTime(r.created_at)}</td>
                       </tr>
                     ))
                   )}

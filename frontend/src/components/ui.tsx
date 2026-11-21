@@ -99,6 +99,30 @@ export function SeverityBadge({ severity }: { severity: "info" | "warning" | "er
   );
 }
 
+export function formatRunStatus(status: string): string {
+  const map: Record<string, string> = {
+    completed: "Completed",
+    completed_with_fallback: "AI + Fallback",
+    failed: "Fallback Active",
+  };
+  if (map[status]) return map[status];
+  return status.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+export function formatShortTime(iso: string): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return iso;
+  const formatted = new Intl.DateTimeFormat("en-GB", {
+    day: "2-digit",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: "UTC",
+    hour12: false,
+  }).format(d);
+  return `${formatted} UTC`;
+}
+
 export function StatCard({
   label,
   value,
@@ -118,11 +142,22 @@ export function StatCard({
       : tone === "success"
       ? "border-emerald-200 bg-emerald-50/40 dark:border-emerald-900 dark:bg-emerald-950/30"
       : "border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900";
+  const isLong = typeof value === "string" && value.length > 10;
   return (
-    <div className={`rounded-xl border p-4 shadow-xs ${border}`}>
-      <div className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{label}</div>
-      <div className="mt-1.5 text-2xl font-bold text-slate-900 dark:text-slate-100 tabular-nums">{value}</div>
-      {sub && <div className="mt-1 text-xs text-slate-500 dark:text-slate-400">{sub}</div>}
+    <div className={`rounded-xl border p-4 shadow-xs min-w-0 overflow-hidden flex flex-col justify-between h-full ${border}`}>
+      <div>
+        <div className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider truncate">
+          {label}
+        </div>
+        <div
+          className={`mt-1.5 font-bold text-slate-900 dark:text-slate-100 tabular-nums leading-tight break-words ${
+            isLong ? "text-lg sm:text-xl" : "text-xl sm:text-2xl"
+          }`}
+        >
+          {value}
+        </div>
+      </div>
+      {sub && <div className="mt-1.5 text-xs text-slate-500 dark:text-slate-400 leading-snug break-words">{sub}</div>}
     </div>
   );
 }
