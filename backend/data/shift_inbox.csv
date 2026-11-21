@@ -1,0 +1,13 @@
+﻿event_id,received_at_ist,thread_id,booking_id,channel,sender,message
+M01,2026-11-23 08:17,T01,B101,WhatsApp,Customer,Dad’s caregiver was due at 8. Nobody has come. I leave for work at 9:10 and Dad will be alone. Please call me.
+M02,2026-11-23 08:23,T02,B102,WhatsApp,Customer,Our 8:15 housekeeping shift hasn’t started. Can you check?
+M03,2026-11-23 08:26,T03,B103,WhatsApp,Customer,"I paid ₹8,000. Sales told me my refund was approved. When will I get it?"
+M04,2026-11-23 08:31,T04,B104,WhatsApp,Customer,Kal cook ko 8 ki jagah 10 baje bhej sakte ho? Please check with her first.
+M05,2026-11-23 08:33,T05,,WhatsApp,Prospect,What would a weekday morning cook in HSR cost? Just comparing options.
+M06,2026-11-23 08:38,T06,B105,WhatsApp,Customer,"Our nanny is out today. My sister is with the baby. Can you look for cover? Please WhatsApp me, don’t call."
+M07,2026-11-23 08:41,S11,B101,Sales handoff,Sales,Forwarding a callback request from B101. Missed 8 am elder support. Family member leaves at 9:10.
+M08,2026-11-23 08:46,T02,B102,WhatsApp,Customer,"Aa gayi hain. She is here now, all sorted. Please close this."
+M09,2026-11-23 08:48,T03,B103,Call note,Sales,Customer followed up. I found the original payment receipt. I don’t see a refund decision.
+M10,2026-11-23 08:51,T07,,WhatsApp,Customer,Is she still coming to HSR today? I have two bookings and can’t remember which booking number this is.
+M11,2026-11-23 08:54,T08,B106,WhatsApp,Customer,"Any update on my ₹2,000 refund? Is it approved, and when will the money reach me?"
+M12,2026-11-23 08:57,T06,B105,WhatsApp,Customer,My sister can cover until 11:30 today. Message me when you know more.

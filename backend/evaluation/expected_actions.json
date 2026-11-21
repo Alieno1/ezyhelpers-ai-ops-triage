@@ -1,0 +1,135 @@
+{
+  "_meta": {
+    "title": "Expected-action reference set (ground truth) for the supplied shift inbox",
+    "authored_at_ist": "2026-11-21T16:20:00+05:30",
+    "authored_before": "Written before the rules-only baseline or the AI-assisted workflow were implemented or run. Do not edit after results are seen; corrections go in a new file with a reason.",
+    "snapshot": "2026-11-23T09:00:00+05:30",
+    "author": "Candidate (human judgement from the assignment PDF rules and the booking register)",
+    "scoring": {
+      "correct_next_action": "action_code matches AND contact_channel matches (calling a customer who asked not to be called is a wrong action)",
+      "department": "responsible_department matches",
+      "urgency": "urgency tier matches",
+      "status": "open/resolved matches",
+      "missing_info": "every key in must_flag_missing is reflected in the missing_information list (keyword match on the listed synonyms)",
+      "unsupported_promise": "draft or action asserts a fact the register/messages do not support (see forbidden list and evidence.py detector)"
+    }
+  },
+  "expected_first_callback": ["M01", "M07"],
+  "expected_second_in_queue": ["M06", "M12"],
+  "cases": [
+    {
+      "source_message_ids": ["M01", "M07"],
+      "booking_id": "B101",
+      "issue_category": "care_gap",
+      "action_code": "CARE_GAP_IMMEDIATE",
+      "contact_channel": "phone",
+      "responsible_department": "Duty Ops",
+      "urgency": "critical",
+      "status": "open",
+      "must_flag_missing": ["caregiver_status", "sourcing_confirmation"],
+      "forbidden_promises": ["caregiver arrival time", "replacement confirmed"],
+      "rationale": "Elder alone from 09:10 with no recorded cover; register says arrival unconfirmed. Customer asked for a call (M01) and Sales forwarded the callback (M07). Duty Ops calls now; Sourcing checks the caregiver / a replacement; no ETA until Sourcing records it."
+    },
+    {
+      "source_message_ids": ["M02", "M08"],
+      "booking_id": "B102",
+      "issue_category": "arrival_confirmed",
+      "action_code": "CLOSE_CONFIRMED_ARRIVAL",
+      "contact_channel": "none",
+      "responsible_department": "Duty Ops",
+      "urgency": "none",
+      "status": "resolved",
+      "must_flag_missing": [],
+      "forbidden_promises": [],
+      "rationale": "Customer confirmed at 08:46 that the helper arrived and asked to close. Close; no callback. Register still says 'Arrival pending' so it should be updated."
+    },
+    {
+      "source_message_ids": ["M03", "M09"],
+      "booking_id": "B103",
+      "issue_category": "refund_query",
+      "action_code": "BILLING_VERIFY_DISPUTED_REFUND",
+      "contact_channel": "whatsapp",
+      "responsible_department": "Billing",
+      "urgency": "medium",
+      "status": "open",
+      "must_flag_missing": ["refund_decision", "payout_date"],
+      "forbidden_promises": ["refund approved", "payout date"],
+      "rationale": "Customer says Sales told them it was approved; register says under review with no approval or payout date; Sales note M09 sees no decision. Billing verifies; holding reply must not confirm approval."
+    },
+    {
+      "source_message_ids": ["M04"],
+      "booking_id": "B104",
+      "issue_category": "schedule_change",
+      "action_code": "SCHEDULE_CHANGE_SOURCING_CHECK",
+      "contact_channel": "whatsapp",
+      "responsible_department": "Duty Ops",
+      "urgency": "medium",
+      "status": "open",
+      "must_flag_missing": ["helper_availability"],
+      "forbidden_promises": ["10:00 start confirmed"],
+      "rationale": "Hinglish request to move tomorrow's (24 Nov) cook from 08:00 to 10:00 and to check with her first. Sourcing must confirm with the helper; Duty Ops acknowledges without promising."
+    },
+    {
+      "source_message_ids": ["M05"],
+      "booking_id": null,
+      "issue_category": "new_enquiry",
+      "action_code": "SALES_ENQUIRY_NO_QUOTE",
+      "contact_channel": "whatsapp",
+      "responsible_department": "Sales",
+      "urgency": "low",
+      "status": "open",
+      "must_flag_missing": ["rate_card"],
+      "forbidden_promises": ["any price"],
+      "rationale": "Prospect comparing options. Sales owns quotes; no rate card exists so no amount may be stated."
+    },
+    {
+      "source_message_ids": ["M06", "M12"],
+      "booking_id": "B105",
+      "issue_category": "care_gap",
+      "action_code": "CARE_GAP_COVERED_CHASE_SOURCING",
+      "contact_channel": "whatsapp",
+      "responsible_department": "Duty Ops",
+      "urgency": "high",
+      "status": "open",
+      "must_flag_missing": ["sourcing_confirmation"],
+      "forbidden_promises": ["substitute confirmed"],
+      "rationale": "Active childcare gap but the sister covers until 11:30 (M12). Customer said WhatsApp, don't call. Chase Sourcing; WhatsApp update; no promise of a substitute."
+    },
+    {
+      "source_message_ids": ["M10"],
+      "booking_id": null,
+      "issue_category": "unidentified_booking",
+      "action_code": "ASK_MINIMUM_BOOKING_IDENTITY",
+      "contact_channel": "whatsapp",
+      "responsible_department": "Duty Ops",
+      "urgency": "high",
+      "status": "open",
+      "must_flag_missing": ["booking_identity"],
+      "forbidden_promises": ["she is coming", "linking to B101 or B104"],
+      "rationale": "No booking reference; customer has two bookings. HSR matches B101 and B104 but locality alone is insufficient. Keep open, ask for the booking number or registered phone. High because it may be a same-day service."
+    },
+    {
+      "source_message_ids": ["M11"],
+      "booking_id": "B106",
+      "issue_category": "refund_query",
+      "action_code": "RELAY_APPROVED_REFUND_CHASE_PAYOUT",
+      "contact_channel": "whatsapp",
+      "responsible_department": "Billing",
+      "urgency": "medium",
+      "status": "open",
+      "must_flag_missing": ["payout_date"],
+      "forbidden_promises": ["payout date"],
+      "rationale": "Register: Rs 2,000 refund approved, payout date pending. Coordinator may relay the approval and amount; Billing confirms the payout date."
+    }
+  ],
+  "missing_info_synonyms": {
+    "caregiver_status": ["caregiver", "arrival", "eta", "status"],
+    "sourcing_confirmation": ["sourcing", "substitute", "replacement", "cover"],
+    "refund_decision": ["refund decision", "approval", "decision"],
+    "payout_date": ["payout"],
+    "helper_availability": ["availability", "available", "confirm with the helper", "helper confirmation", "sourcing"],
+    "rate_card": ["rate card", "pricing", "price"],
+    "booking_identity": ["booking number", "booking id", "booking reference", "identity", "registered"]
+  }
+}
+

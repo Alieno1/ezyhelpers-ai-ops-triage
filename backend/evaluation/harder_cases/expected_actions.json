@@ -1,0 +1,96 @@
+{
+  "_meta": {
+    "title": "SYNTHETIC harder test set (clearly labelled: invented examples, not EzyHelpers data)",
+    "authored_at_ist": "2026-11-21T16:22:00+05:30",
+    "authored_before": "Written before either method was run. The assignment allows inventing extra examples to test the approach.",
+    "purpose": "Stress Hinglish, negation, conflicting claims, missing booking references and contact preference conflicts."
+  },
+  "cases": [
+    {
+      "source_message_ids": ["H01"],
+      "booking_id": "B201",
+      "issue_category": "care_gap",
+      "action_code": "CARE_GAP_IMMEDIATE",
+      "contact_channel": "phone",
+      "responsible_department": "Duty Ops",
+      "urgency": "critical",
+      "status": "open",
+      "must_flag_missing": ["sourcing_confirmation"],
+      "forbidden_promises": ["caregiver arrival time"],
+      "rationale": "Hinglish: caregiver has not come, mother alone, customer leaves at 9:30, asks for a call."
+    },
+    {
+      "source_message_ids": ["H02"],
+      "booking_id": "B204",
+      "issue_category": "schedule_change",
+      "action_code": "SCHEDULE_CHANGE_SOURCING_CHECK",
+      "contact_channel": "whatsapp",
+      "responsible_department": "Duty Ops",
+      "urgency": "medium",
+      "status": "open",
+      "must_flag_missing": ["helper_availability"],
+      "forbidden_promises": ["10:00 start confirmed"],
+      "rationale": "Customer claims a 10 am change was already confirmed; register only records the original 07:30 start. Must not confirm."
+    },
+    {
+      "source_message_ids": ["H03"],
+      "booking_id": null,
+      "issue_category": "unidentified_booking",
+      "action_code": "ASK_MINIMUM_BOOKING_IDENTITY",
+      "contact_channel": "whatsapp",
+      "responsible_department": "Duty Ops",
+      "urgency": "medium",
+      "status": "open",
+      "must_flag_missing": ["booking_identity"],
+      "forbidden_promises": ["refund approved", "payout date"],
+      "rationale": "Refund question with no booking reference. Identify the booking first; nothing about the refund can be confirmed."
+    },
+    {
+      "source_message_ids": ["H04"],
+      "booking_id": "B202",
+      "issue_category": "service_gap",
+      "action_code": "SERVICE_GAP_CHECK_ARRIVAL",
+      "contact_channel": "whatsapp",
+      "responsible_department": "Duty Ops",
+      "urgency": "high",
+      "status": "open",
+      "must_flag_missing": ["caregiver_status"],
+      "forbidden_promises": ["helper arrival time"],
+      "rationale": "Negation: 'please don't close this, she still hasn't come, it's not sorted'. Must NOT be closed. Housekeeping (no dependant at risk) so high, not critical."
+    },
+    {
+      "source_message_ids": ["H05"],
+      "booking_id": null,
+      "issue_category": "new_enquiry",
+      "action_code": "SALES_ENQUIRY_NO_QUOTE",
+      "contact_channel": "whatsapp",
+      "responsible_department": "Sales",
+      "urgency": "low",
+      "status": "open",
+      "must_flag_missing": ["rate_card"],
+      "forbidden_promises": ["any price"],
+      "rationale": "Prospect quotes a price they saw and asks us to confirm it. No rate card, so no price can be confirmed."
+    },
+    {
+      "source_message_ids": ["H06"],
+      "booking_id": "B203",
+      "issue_category": "care_gap",
+      "action_code": "CARE_GAP_IMMEDIATE",
+      "contact_channel": "whatsapp",
+      "responsible_department": "Duty Ops",
+      "urgency": "critical",
+      "status": "open",
+      "must_flag_missing": ["sourcing_confirmation"],
+      "forbidden_promises": ["substitute confirmed"],
+      "rationale": "Childcare gap, parent alone and leaving in 20 minutes, no cover. Customer cannot take calls: immediate contact must be WhatsApp."
+    }
+  ],
+  "missing_info_synonyms": {
+    "caregiver_status": ["caregiver", "arrival", "eta", "status", "helper"],
+    "sourcing_confirmation": ["sourcing", "substitute", "replacement", "cover"],
+    "helper_availability": ["availability", "available", "helper confirmation", "sourcing"],
+    "rate_card": ["rate card", "pricing", "price"],
+    "booking_identity": ["booking number", "booking id", "booking reference", "identity", "registered"]
+  }
+}
+

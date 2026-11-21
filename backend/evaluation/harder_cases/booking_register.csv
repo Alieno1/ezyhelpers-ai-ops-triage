@@ -1,0 +1,6 @@
+booking_id,service,locality,scheduled_start_ist,updated_at_ist,operations_record,billing_record
+B201,Elder companionship,Indiranagar,2026-11-23 08:00,2026-11-22 19:00,Regular caregiver assigned. Arrival unconfirmed.,
+B202,Housekeeping,Koramangala,2026-11-23 08:00,2026-11-23 07:55,Helper assigned. Arrival pending.,
+B203,Childcare,Marathahalli,2026-11-23 08:30,2026-11-23 08:35,Nanny unavailable. No substitute confirmed.,
+B204,Cooking,Koramangala,2026-11-24 07:30,2026-11-22 17:00,07:30 start confirmed with the helper.,
+
