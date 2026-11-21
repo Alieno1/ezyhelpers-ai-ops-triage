@@ -119,7 +119,7 @@ export default function OverviewPage() {
   const m = data.metrics;
   const fc = data.first_callback;
   const gridColor = isDark ? "#334155" : "#e2e8f0";
-  const axisTick = { fontSize: 11, fill: isDark ? "#94a3b8" : "#475569" };
+  const axisTick = { fontSize: 12, fill: isDark ? "#cbd5e1" : "#475569" };
   const tooltipCursor = {
     fill: isDark ? "rgba(148, 163, 184, 0.14)" : "rgba(15, 23, 42, 0.06)",
   };
@@ -130,7 +130,7 @@ export default function OverviewPage() {
         borderRadius: 8,
         boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.5)",
         color: "#f8fafc",
-        fontSize: 12,
+        fontSize: 13,
       }
     : {
         backgroundColor: "#ffffff",
@@ -138,7 +138,7 @@ export default function OverviewPage() {
         borderRadius: 8,
         boxShadow: "0 10px 25px -5px rgba(15, 23, 42, 0.12)",
         color: "#0f172a",
-        fontSize: 12,
+        fontSize: 13,
       };
   const tooltipLabelStyle = {
     color: isDark ? "#f8fafc" : "#0f172a",
@@ -171,34 +171,34 @@ export default function OverviewPage() {
             type="button"
             disabled={busy}
             onClick={() => triggerRules("v1")}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 disabled:opacity-50 cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-slate-300 bg-white text-sm font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 disabled:opacity-50 cursor-pointer"
           >
-            <Play className="w-3.5 h-3.5" /> Rules v1 (Baseline)
+            <Play className="w-4 h-4" /> Rules v1 (Baseline)
           </button>
           <button
             type="button"
             disabled={busy}
             onClick={() => triggerRules("v2")}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900 text-white text-xs font-medium hover:bg-slate-800 dark:bg-sky-500 dark:text-slate-950 dark:hover:bg-sky-400 disabled:opacity-50 cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-slate-900 text-white text-sm font-medium hover:bg-slate-800 dark:bg-sky-500 dark:text-slate-950 dark:hover:bg-sky-400 disabled:opacity-50 cursor-pointer"
           >
-            <Play className="w-3.5 h-3.5" /> Rules v2 (Improved)
+            <Play className="w-4 h-4" /> Rules v2 (Improved)
           </button>
           <button
             type="button"
             disabled={busy}
             onClick={triggerAi}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-violet-300 bg-violet-50 text-xs font-medium text-violet-800 hover:bg-violet-100 dark:border-violet-800 dark:bg-violet-950/60 dark:text-violet-300 dark:hover:bg-violet-900/60 disabled:opacity-50 cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-violet-300 bg-violet-50 text-sm font-medium text-violet-800 hover:bg-violet-100 dark:border-violet-800 dark:bg-violet-950/60 dark:text-violet-300 dark:hover:bg-violet-900/60 disabled:opacity-50 cursor-pointer"
           >
-            <Cpu className="w-3.5 h-3.5" />
+            <Cpu className="w-4 h-4" />
             {data.openrouter_configured ? "Run OpenRouter AI" : "Run AI (Fallback Check)"}
           </button>
           <button
             type="button"
             disabled={busy}
             onClick={triggerReset}
-            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 disabled:opacity-50 cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-slate-300 bg-white text-sm font-medium text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 disabled:opacity-50 cursor-pointer"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${busy ? "animate-spin" : ""}`} /> Reset
+            <RefreshCw className={`w-4 h-4 ${busy ? "animate-spin" : ""}`} /> Reset
           </button>
         </div>
       </div>
@@ -208,17 +208,17 @@ export default function OverviewPage() {
 
       {/* First Callback Hero Card */}
       {fc ? (
-        <section className="rounded-xl border-2 border-red-200 bg-white dark:border-red-900/80 dark:bg-slate-900 p-4 sm:p-5 shadow-xs space-y-3">
+        <section className="rounded-xl border-2 border-red-200 bg-white dark:border-red-900/80 dark:bg-slate-900 p-5 sm:p-6 shadow-xs space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="flex items-start sm:items-center gap-2.5 min-w-0">
-              <div className="w-9 h-9 shrink-0 rounded-lg bg-red-600 text-white flex items-center justify-center">
+            <div className="flex items-start sm:items-center gap-3 min-w-0">
+              <div className="w-10 h-10 shrink-0 rounded-lg bg-red-600 text-white flex items-center justify-center">
                 <PhoneCall className="w-5 h-5" />
               </div>
               <div className="min-w-0">
                 <div className="text-xs font-bold text-red-700 dark:text-red-400 uppercase tracking-wider">
                   Who Gets the First Callback (#1 in Queue)
                 </div>
-                <div className="text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100 break-words">
+                <div className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100 break-words">
                   {fc.issue_id} · Booking {fc.booking_id || "Unlinked"} ({fc.source_message_ids.join(", ")})
                 </div>
               </div>
@@ -229,19 +229,19 @@ export default function OverviewPage() {
               <ChannelBadge channel={fc.channel} />
               <Link
                 href={`/issues/${fc.issue_id}`}
-                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-600 text-white text-xs font-semibold hover:bg-red-700 shrink-0"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-red-600 text-white text-sm font-semibold hover:bg-red-700 shrink-0"
               >
-                Inspect Evidence <ArrowRight className="w-3.5 h-3.5" />
+                Inspect Evidence <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1 text-xs">
-            <div className="rounded-lg bg-red-50/50 border border-red-100 dark:bg-red-950/30 dark:border-red-900/60 p-3 space-y-1 min-w-0">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1 text-sm">
+            <div className="rounded-lg bg-red-50/50 border border-red-100 dark:bg-red-950/30 dark:border-red-900/60 p-3.5 space-y-1 min-w-0">
               <div className="font-semibold text-red-900 dark:text-red-300">Why #1 Before Any Other Case</div>
               <div className="text-slate-800 dark:text-slate-200 leading-relaxed break-words">{fc.why_first}</div>
             </div>
-            <div className="rounded-lg bg-slate-50 border border-slate-200 dark:bg-slate-800/70 dark:border-slate-700 p-3 space-y-1 min-w-0">
+            <div className="rounded-lg bg-slate-50 border border-slate-200 dark:bg-slate-800/70 dark:border-slate-700 p-3.5 space-y-1 min-w-0">
               <div className="font-semibold text-slate-900 dark:text-slate-100">Immediate Coordinator Next Action</div>
               <div className="text-slate-800 dark:text-slate-200 leading-relaxed break-words">{fc.next_action}</div>
             </div>
@@ -286,8 +286,8 @@ export default function OverviewPage() {
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         <div className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-5 shadow-xs min-w-0">
-          <h2 className="text-sm font-bold text-slate-900 dark:text-slate-100 mb-3">Issues by Urgency Tier</h2>
-          <div className="h-56 w-full">
+          <h2 className="text-base font-bold text-slate-900 dark:text-slate-100 mb-3">Issues by Urgency Tier</h2>
+          <div className="h-64 w-full">
             {mounted && (
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={data.urgency_breakdown} margin={{ top: 4, right: 8, left: -16, bottom: 0 }}>
@@ -300,7 +300,7 @@ export default function OverviewPage() {
                     labelStyle={tooltipLabelStyle}
                     itemStyle={tooltipItemStyle}
                   />
-                  <Bar dataKey="count" name="Issues" fill={isDark ? "#60a5fa" : "#2563eb"} radius={[4, 4, 0, 0]}>
+                  <Bar dataKey="count" name="Issues" fill={isDark ? "#60a5fa" : "#2563eb"} radius={[4, 4, 0, 0]} isAnimationActive={false}>
                     {data.urgency_breakdown.map((entry) => (
                       <Cell key={entry.urgency} fill={URGENCY_COLORS[entry.urgency] || "#475569"} />
                     ))}
@@ -312,8 +312,8 @@ export default function OverviewPage() {
         </div>
 
         <div className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-5 shadow-xs min-w-0">
-          <h2 className="text-sm font-bold text-slate-900 dark:text-slate-100 mb-3">Owning Department Distribution</h2>
-          <div className="h-56 w-full">
+          <h2 className="text-base font-bold text-slate-900 dark:text-slate-100 mb-3">Owning Department Distribution</h2>
+          <div className="h-64 w-full">
             {mounted && (
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={data.department_breakdown} margin={{ top: 4, right: 8, left: -16, bottom: 0 }}>
@@ -326,7 +326,7 @@ export default function OverviewPage() {
                     labelStyle={tooltipLabelStyle}
                     itemStyle={tooltipItemStyle}
                   />
-                  <Bar dataKey="count" name="Issues" fill={isDark ? "#38bdf8" : "#0f172a"} radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="count" name="Issues" fill={isDark ? "#38bdf8" : "#0f172a"} radius={[4, 4, 0, 0]} isAnimationActive={false} />
                 </BarChart>
               </ResponsiveContainer>
             )}
@@ -337,14 +337,14 @@ export default function OverviewPage() {
       {/* Run Notes & Recent Runs */}
       <div className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-5 shadow-xs space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <h2 className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+          <h2 className="text-base font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
             <ShieldAlert className="w-4 h-4 text-slate-600 dark:text-slate-400 shrink-0" /> Execution Notes &amp; Recent Runs
           </h2>
-          <Link href="/queue" className="text-xs font-medium text-slate-700 dark:text-sky-400 underline hover:text-slate-900 dark:hover:text-sky-300">
+          <Link href="/queue" className="text-sm font-medium text-slate-700 dark:text-sky-400 underline hover:text-slate-900 dark:hover:text-sky-300">
             Open Full Priority Queue &rarr;
           </Link>
         </div>
-        <div className="text-xs text-slate-600 dark:text-slate-400 space-y-1 break-words">
+        <div className="text-sm text-slate-700 dark:text-slate-300 space-y-1 break-words">
           {data.notes.map((n, i) => (
             <div key={i}>• {n}</div>
           ))}

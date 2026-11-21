@@ -13,7 +13,7 @@ export function UrgencyBadge({ urgency }: { urgency: Urgency | string }) {
     none: "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/70 dark:text-emerald-300 dark:border-emerald-800 font-medium",
   };
   return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs border uppercase tracking-wide ${styles[urgency] || styles.low}`}>
+    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs border uppercase tracking-wide ${styles[urgency] || styles.low}`}>
       {urgency}
     </span>
   );
@@ -27,7 +27,7 @@ export function StatusBadge({ status }: { status: IssueStatus | string }) {
   };
   const label = status === "awaiting_info" ? "Awaiting Info" : status;
   return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs border capitalize font-medium ${styles[status] || styles.open}`}>
+    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-md text-xs border capitalize font-medium ${styles[status] || styles.open}`}>
       {label}
     </span>
   );
@@ -41,7 +41,7 @@ export function DepartmentBadge({ department }: { department: string }) {
     Sourcing: "bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-950/70 dark:text-orange-300 dark:border-orange-800",
   };
   return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs border font-medium ${styles[department] || "bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700"}`}>
+    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-md text-xs border font-medium ${styles[department] || "bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700"}`}>
       {department}
     </span>
   );
@@ -50,19 +50,19 @@ export function DepartmentBadge({ department }: { department: string }) {
 export function ChannelBadge({ channel }: { channel: Channel | string }) {
   if (channel === "phone") {
     return (
-      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-950/70 dark:text-rose-300 dark:border-rose-800 font-medium">
-        <Phone className="w-3 h-3" /> Call
+      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-xs bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-950/70 dark:text-rose-300 dark:border-rose-800 font-medium">
+        <Phone className="w-3.5 h-3.5" /> Call
       </span>
     );
   }
   if (channel === "whatsapp") {
     return (
-      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/70 dark:text-emerald-300 dark:border-emerald-800 font-medium">
-        <MessageSquare className="w-3 h-3" /> WhatsApp
+      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-xs bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/70 dark:text-emerald-300 dark:border-emerald-800 font-medium">
+        <MessageSquare className="w-3.5 h-3.5" /> WhatsApp
       </span>
     );
   }
-  return <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs bg-slate-100 text-slate-500 border border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700">Hold / None</span>;
+  return <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs bg-slate-100 text-slate-500 border border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700">Hold / None</span>;
 }
 
 export function SourceBadge({ source }: { source: string }) {
@@ -74,27 +74,27 @@ export function SourceBadge({ source }: { source: string }) {
     human: { label: "Human Verified", cls: "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/70 dark:text-emerald-300 dark:border-emerald-800" },
   };
   const info = map[source] || { label: source, cls: "bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700" };
-  return <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs border font-medium ${info.cls}`}>{info.label}</span>;
+  return <span className={`inline-flex items-center px-2.5 py-0.5 rounded text-xs border font-medium ${info.cls}`}>{info.label}</span>;
 }
 
 export function SeverityBadge({ severity }: { severity: "info" | "warning" | "error" }) {
   if (severity === "error") {
     return (
-      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs bg-red-50 text-red-700 border border-red-200 dark:bg-red-950/70 dark:text-red-300 dark:border-red-800 font-semibold">
-        <ShieldAlert className="w-3 h-3" /> Error
+      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-xs bg-red-50 text-red-700 border border-red-200 dark:bg-red-950/70 dark:text-red-300 dark:border-red-800 font-semibold">
+        <ShieldAlert className="w-3.5 h-3.5" /> Error
       </span>
     );
   }
   if (severity === "warning") {
     return (
-      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs bg-amber-50 text-amber-800 border border-amber-200 dark:bg-amber-950/70 dark:text-amber-300 dark:border-amber-800 font-medium">
-        <AlertCircle className="w-3 h-3" /> Warning
+      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-xs bg-amber-50 text-amber-800 border border-amber-200 dark:bg-amber-950/70 dark:text-amber-300 dark:border-amber-800 font-medium">
+        <AlertCircle className="w-3.5 h-3.5" /> Warning
       </span>
     );
   }
   return (
-    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs bg-slate-100 text-slate-600 border border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700">
-      <Info className="w-3 h-3" /> Info
+    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-xs bg-slate-100 text-slate-600 border border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700">
+      <Info className="w-3.5 h-3.5" /> Info
     </span>
   );
 }
@@ -156,20 +156,20 @@ export function StatCard({
       : "border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900";
   const isLong = typeof value === "string" && value.length > 10;
   return (
-    <div className={`rounded-xl border p-4 shadow-xs min-w-0 overflow-hidden flex flex-col justify-between h-full ${border}`}>
+    <div className={`rounded-xl border p-5 shadow-xs min-w-0 overflow-hidden flex flex-col justify-between h-full ${border}`}>
       <div>
-        <div className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider truncate">
+        <div className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider truncate">
           {label}
         </div>
         <div
-          className={`mt-1.5 font-bold text-slate-900 dark:text-slate-100 tabular-nums leading-tight break-words ${
-            isLong ? "text-lg sm:text-xl" : "text-xl sm:text-2xl"
+          className={`mt-2 font-bold text-slate-900 dark:text-slate-100 tabular-nums leading-tight break-words ${
+            isLong ? "text-xl sm:text-2xl" : "text-2xl sm:text-3xl"
           }`}
         >
           {value}
         </div>
       </div>
-      {sub && <div className="mt-1.5 text-xs text-slate-500 dark:text-slate-400 leading-snug break-words">{sub}</div>}
+      {sub && <div className="mt-2 text-xs text-slate-600 dark:text-slate-300 leading-snug break-words">{sub}</div>}
     </div>
   );
 }

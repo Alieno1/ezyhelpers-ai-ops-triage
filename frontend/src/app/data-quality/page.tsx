@@ -87,9 +87,9 @@ export default function DataQualityPage() {
           type="button"
           disabled={busy}
           onClick={handleReset}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 disabled:opacity-50"
+          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-slate-300 bg-white text-sm font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 disabled:opacity-50 cursor-pointer"
         >
-          <RotateCcw className="w-3.5 h-3.5" /> Reset to Source CSVs
+          <RotateCcw className="w-4 h-4" /> Reset to Source CSVs
         </button>
       </div>
 
@@ -100,10 +100,10 @@ export default function DataQualityPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <label className="rounded-xl border border-dashed border-slate-300 bg-white hover:border-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:hover:border-slate-500 p-4 cursor-pointer flex flex-wrap sm:flex-nowrap items-center justify-between gap-3">
           <div className="min-w-0">
-            <div className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+            <div className="text-base font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
               <Upload className="w-4 h-4 text-slate-600 dark:text-slate-400 shrink-0" /> Upload booking_register.csv
             </div>
-            <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 break-words">
+            <div className="text-sm text-slate-500 dark:text-slate-400 mt-0.5 break-words">
               Current rows: {data?.files["booking_register.csv"]?.rows ?? "-"} · Max 256 KB · UTF-8 / BOM supported
             </div>
           </div>
@@ -114,15 +114,15 @@ export default function DataQualityPage() {
             className="hidden"
             onChange={(e) => handleUpload("bookings", e.target.files?.[0])}
           />
-          <span className="px-3 py-1.5 rounded-lg bg-slate-900 text-white dark:bg-sky-500 dark:text-slate-950 text-xs font-medium shrink-0">Choose CSV</span>
+          <span className="px-3.5 py-2 rounded-lg bg-slate-900 text-white dark:bg-sky-500 dark:text-slate-950 text-sm font-medium shrink-0">Choose CSV</span>
         </label>
 
         <label className="rounded-xl border border-dashed border-slate-300 bg-white hover:border-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:hover:border-slate-500 p-4 cursor-pointer flex flex-wrap sm:flex-nowrap items-center justify-between gap-3">
           <div className="min-w-0">
-            <div className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+            <div className="text-base font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
               <Upload className="w-4 h-4 text-slate-600 dark:text-slate-400 shrink-0" /> Upload shift_inbox.csv
             </div>
-            <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 break-words">
+            <div className="text-sm text-slate-500 dark:text-slate-400 mt-0.5 break-words">
               Current rows: {data?.files["shift_inbox.csv"]?.rows ?? "-"} · Max 256 KB · Re-runs deterministic triage
             </div>
           </div>
@@ -133,7 +133,7 @@ export default function DataQualityPage() {
             className="hidden"
             onChange={(e) => handleUpload("inbox", e.target.files?.[0])}
           />
-          <span className="px-3 py-1.5 rounded-lg bg-slate-900 text-white dark:bg-sky-500 dark:text-slate-950 text-xs font-medium shrink-0">Choose CSV</span>
+          <span className="px-3.5 py-2 rounded-lg bg-slate-900 text-white dark:bg-sky-500 dark:text-slate-950 text-sm font-medium shrink-0">Choose CSV</span>
         </label>
       </div>
 
@@ -151,12 +151,12 @@ export default function DataQualityPage() {
 
           <div className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 shadow-xs overflow-hidden">
             <div className="px-4 py-3 border-b border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-800/70 flex flex-wrap items-center justify-between gap-2">
-              <h2 className="text-sm font-bold text-slate-900 dark:text-slate-100">Data-Quality Findings ({filtered.length})</h2>
+              <h2 className="text-base font-bold text-slate-900 dark:text-slate-100">Data-Quality Findings ({filtered.length})</h2>
               <select
                 aria-label="Filter severity"
                 value={severityFilter}
                 onChange={(e) => setSeverityFilter(e.target.value)}
-                className="rounded-lg border border-slate-300 px-2.5 py-1 text-xs bg-white text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                className="rounded-lg border border-slate-300 px-3.5 py-2 text-sm bg-white text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
               >
                 <option value="">All Severities</option>
                 <option value="error">Error</option>
@@ -195,7 +195,7 @@ export default function DataQualityPage() {
                       </td>
                       <td className="py-2.5 px-4 max-w-md">
                         <div className="text-slate-900 dark:text-slate-100">{d.problem}</div>
-                        <div className="text-slate-500 dark:text-slate-400 mt-0.5">Action: {d.recommended_action}</div>
+                        <div className="text-slate-600 dark:text-slate-300 mt-0.5">Action: {d.recommended_action}</div>
                       </td>
                       <td className="py-2.5 px-4">{d.human_review_required ? "Yes" : "No"}</td>
                     </tr>

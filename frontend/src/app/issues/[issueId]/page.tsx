@@ -145,9 +145,9 @@ export default function IssueDetailPage() {
         <div className="flex items-start sm:items-center gap-3 min-w-0">
           <Link
             href="/queue"
-            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 shrink-0"
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-slate-300 bg-white text-sm font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 shrink-0"
           >
-            <ArrowLeft className="w-3.5 h-3.5" /> Queue
+            <ArrowLeft className="w-4 h-4" /> Queue
           </Link>
           <div className="min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
@@ -159,7 +159,7 @@ export default function IssueDetailPage() {
               <StatusBadge status={f.status} />
               <SourceBadge source={f.source} />
             </div>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 break-words">
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 break-words">
               Booking: <span className="font-mono font-semibold">{issue.group.booking_id || "Unlinked"}</span> · Messages:{" "}
               <span className="font-mono">{issue.group.source_message_ids.join(", ")}</span>
               {runMeta && (
@@ -548,7 +548,7 @@ export default function IssueDetailPage() {
                       <span className="text-slate-500 dark:text-slate-400 font-normal">{r.reviewer}</span>
                     </div>
                     {r.reason && <div className="text-slate-700 dark:text-slate-300 break-words">Reason: {r.reason}</div>}
-                    <div className="text-[11px] text-slate-400 dark:text-slate-500 font-mono">{formatShortTime(r.created_at)}</div>
+                    <div className="text-xs text-slate-400 dark:text-slate-500 font-mono">{formatShortTime(r.created_at)}</div>
                   </div>
                 ))}
               </div>

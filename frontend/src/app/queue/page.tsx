@@ -82,7 +82,7 @@ export default function QueuePage() {
         </div>
         <Link
           href="/exports"
-          className="px-3 py-1.5 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 shrink-0"
+          className="px-3.5 py-2 rounded-lg border border-slate-300 bg-white text-sm font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 shrink-0"
         >
           Export CSV / XLSX
         </Link>
@@ -90,9 +90,9 @@ export default function QueuePage() {
 
       {/* Filters */}
       <div className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-4 shadow-xs space-y-3">
-        <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+        <div className="flex items-center justify-between text-sm text-slate-500 dark:text-slate-400">
           <div className="flex items-center gap-1.5 font-semibold text-slate-700 dark:text-slate-200">
-            <Filter className="w-3.5 h-3.5" /> Filter &amp; Sort Queue
+            <Filter className="w-4 h-4" /> Filter &amp; Sort Queue
           </div>
           {activeFilterCount > 0 && (
             <button
@@ -112,20 +112,20 @@ export default function QueuePage() {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-2.5">
           <div className="lg:col-span-2 relative">
-            <Search className="w-4 h-4 text-slate-400 absolute left-2.5 top-2.5" />
+            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search ID, booking, M01, text..."
-              className="w-full pl-8 pr-3 py-1.5 rounded-lg border border-slate-300 bg-white text-sm text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900 dark:focus:ring-sky-500"
+              className="w-full pl-9 pr-3 py-2 rounded-lg border border-slate-300 bg-white text-sm text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900 dark:focus:ring-sky-500"
             />
           </div>
           <select
             aria-label="Filter urgency"
             value={urgency}
             onChange={(e) => setUrgency(e.target.value)}
-            className="rounded-lg border border-slate-300 px-2.5 py-1.5 text-sm bg-white text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+            className="rounded-lg border border-slate-300 px-3 py-2 text-sm bg-white text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
           >
             <option value="">All Urgencies</option>
             <option value="critical">Critical</option>
@@ -138,7 +138,7 @@ export default function QueuePage() {
             aria-label="Filter department"
             value={department}
             onChange={(e) => setDepartment(e.target.value)}
-            className="rounded-lg border border-slate-300 px-2.5 py-1.5 text-sm bg-white text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+            className="rounded-lg border border-slate-300 px-3 py-2 text-sm bg-white text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
           >
             <option value="">All Departments</option>
             <option value="Duty Ops">Duty Ops</option>
@@ -150,7 +150,7 @@ export default function QueuePage() {
             aria-label="Filter status"
             value={status}
             onChange={(e) => setStatus(e.target.value)}
-            className="rounded-lg border border-slate-300 px-2.5 py-1.5 text-sm bg-white text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+            className="rounded-lg border border-slate-300 px-3 py-2 text-sm bg-white text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
           >
             <option value="">All Statuses</option>
             <option value="open">Open</option>
@@ -162,7 +162,7 @@ export default function QueuePage() {
               aria-label="Sort by"
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
-              className="flex-1 min-w-0 rounded-lg border border-slate-300 px-2 py-1.5 text-sm bg-white text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+              className="flex-1 min-w-0 rounded-lg border border-slate-300 px-2.5 py-2 text-sm bg-white text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
             >
               <option value="priority_rank">Sort: Rank</option>
               <option value="urgency">Sort: Urgency</option>
@@ -173,13 +173,13 @@ export default function QueuePage() {
               type="button"
               onClick={() => setSortDir((d) => (d === "asc" ? "desc" : "asc"))}
               title={`Toggle sort (${sortDir})`}
-              className="p-2 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 cursor-pointer shrink-0"
+              className="p-2.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 cursor-pointer shrink-0"
             >
               <ArrowUpDown className="w-4 h-4 text-slate-600 dark:text-slate-300" />
             </button>
           </div>
         </div>
-        <label className="inline-flex items-center gap-2 text-xs text-slate-700 dark:text-slate-300 cursor-pointer">
+        <label className="inline-flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300 cursor-pointer">
           <input
             type="checkbox"
             checked={reviewOnly}
@@ -224,7 +224,7 @@ export default function QueuePage() {
                       </div>
                       <Link
                         href={`/issues/${iss.issue_id}`}
-                        className="inline-flex items-center px-2.5 py-1 rounded-lg bg-slate-900 text-white text-xs font-medium hover:bg-slate-800 dark:bg-sky-500 dark:text-slate-950 dark:hover:bg-sky-400 shrink-0"
+                        className="inline-flex items-center px-3 py-1.5 rounded-lg bg-slate-900 text-white text-sm font-medium hover:bg-slate-800 dark:bg-sky-500 dark:text-slate-950 dark:hover:bg-sky-400 shrink-0"
                       >
                         Review
                       </Link>
@@ -244,16 +244,16 @@ export default function QueuePage() {
                       </div>
                     )}
 
-                    <div className="text-xs text-slate-800 dark:text-slate-200 leading-relaxed">{f.next_action}</div>
+                    <div className="text-sm text-slate-800 dark:text-slate-200 leading-relaxed">{f.next_action}</div>
 
                     {f.missing_information.length > 0 && (
-                      <div className="text-[11px] text-amber-800 dark:text-amber-300">
+                      <div className="text-xs text-amber-800 dark:text-amber-300">
                         Missing: {f.missing_information[0]}
                         {f.missing_information.length > 1 ? ` (+${f.missing_information.length - 1})` : ""}
                       </div>
                     )}
 
-                    <div className="flex flex-wrap items-center justify-between gap-2 pt-1.5 border-t border-slate-100 dark:border-slate-800 text-[11px] text-slate-500 dark:text-slate-400">
+                    <div className="flex flex-wrap items-center justify-between gap-2 pt-1.5 border-t border-slate-100 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400">
                       <div className="flex flex-wrap items-center gap-1">
                         {iss.group.source_message_ids.map((mid) => (
                           <span
@@ -278,17 +278,17 @@ export default function QueuePage() {
           {/* Desktop Table View */}
           <div className="hidden md:block rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 shadow-xs overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[880px] text-left border-collapse text-sm">
+              <table className="w-full text-left border-collapse text-sm">
                 <thead>
                   <tr className="bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-600 dark:bg-slate-800/70 dark:border-slate-800 dark:text-slate-400 uppercase tracking-wider">
-                    <th className="py-3 px-4">#</th>
-                    <th className="py-3 px-4">Issue / Booking</th>
-                    <th className="py-3 px-4">Urgency</th>
-                    <th className="py-3 px-4">Department</th>
-                    <th className="py-3 px-4">Next Action &amp; Channel</th>
-                    <th className="py-3 px-4">Source IDs</th>
-                    <th className="py-3 px-4">Status &amp; Source</th>
-                    <th className="py-3 px-4 text-right">Inspect</th>
+                    <th className="py-3 px-3">#</th>
+                    <th className="py-3 px-3">Issue / Booking</th>
+                    <th className="py-3 px-3">Urgency</th>
+                    <th className="py-3 px-3">Department</th>
+                    <th className="py-3 px-3">Next Action &amp; Channel</th>
+                    <th className="py-3 px-3">Source IDs</th>
+                    <th className="py-3 px-3">Status &amp; Source</th>
+                    <th className="py-3 px-3 text-right">Inspect</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
@@ -303,13 +303,13 @@ export default function QueuePage() {
                       const f = iss.final;
                       return (
                         <tr key={iss.issue_id} className="hover:bg-slate-50/70 dark:hover:bg-slate-800/50 align-top">
-                          <td className="py-3.5 px-4 font-bold text-slate-900 dark:text-slate-100 tabular-nums">
+                          <td className="py-3.5 px-3 font-bold text-slate-900 dark:text-slate-100 tabular-nums">
                             {f.priority_rank ?? "-"}
                           </td>
-                          <td className="py-3.5 px-4 whitespace-nowrap">
+                          <td className="py-3.5 px-3">
                             <Link
                               href={`/issues/${iss.issue_id}`}
-                              className="font-semibold text-slate-900 dark:text-slate-100 hover:underline"
+                              className="font-semibold text-slate-900 dark:text-slate-100 hover:underline whitespace-nowrap"
                             >
                               {iss.issue_id}
                             </Link>
@@ -318,36 +318,36 @@ export default function QueuePage() {
                               {iss.booking?.locality ? ` · ${iss.booking.locality}` : ""}
                             </div>
                           </td>
-                          <td className="py-3.5 px-4 whitespace-nowrap">
+                          <td className="py-3.5 px-3 whitespace-nowrap">
                             <UrgencyBadge urgency={f.urgency} />
                             {f.deadline && (
-                              <div className="text-[11px] text-rose-700 dark:text-rose-400 font-medium mt-1">
+                              <div className="text-xs text-rose-700 dark:text-rose-400 font-medium mt-1">
                                 Deadline: {f.deadline}
                               </div>
                             )}
                           </td>
-                          <td className="py-3.5 px-4 whitespace-nowrap">
+                          <td className="py-3.5 px-3 whitespace-nowrap">
                             <DepartmentBadge department={f.responsible_department} />
                             {f.supporting_departments.length > 0 && (
-                              <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
+                              <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                                 + {f.supporting_departments.join(", ")}
                               </div>
                             )}
                           </td>
-                          <td className="py-3.5 px-4 max-w-md">
+                          <td className="py-3.5 px-3 max-w-sm min-w-[260px]">
                             <div className="flex flex-wrap items-center gap-1.5 mb-1">
                               <ChannelBadge channel={f.contact_channel} />
-                              <code className="text-[11px] text-slate-500 dark:text-slate-400 font-mono break-all">{f.action_code}</code>
+                              <code className="text-xs text-slate-500 dark:text-slate-400 font-mono break-all">{f.action_code}</code>
                             </div>
-                            <div className="text-slate-800 dark:text-slate-200 text-xs leading-relaxed">{f.next_action}</div>
+                            <div className="text-slate-800 dark:text-slate-200 text-sm leading-relaxed">{f.next_action}</div>
                             {f.missing_information.length > 0 && (
-                              <div className="mt-1 text-[11px] text-amber-800 dark:text-amber-300">
+                              <div className="mt-1 text-xs text-amber-800 dark:text-amber-300">
                                 Missing: {f.missing_information[0]}
                                 {f.missing_information.length > 1 ? ` (+${f.missing_information.length - 1})` : ""}
                               </div>
                             )}
                           </td>
-                          <td className="py-3.5 px-4 whitespace-nowrap">
+                          <td className="py-3.5 px-3 whitespace-nowrap">
                             <div className="flex flex-wrap gap-1">
                               {iss.group.source_message_ids.map((mid) => (
                                 <span
@@ -358,11 +358,11 @@ export default function QueuePage() {
                                 </span>
                               ))}
                             </div>
-                            <div className="text-[11px] text-slate-400 dark:text-slate-500 mt-1">
+                            <div className="text-xs text-slate-400 dark:text-slate-500 mt-1">
                               Threads: {iss.group.thread_ids.join(", ") || "-"}
                             </div>
                           </td>
-                          <td className="py-3.5 px-4 whitespace-nowrap space-y-1">
+                          <td className="py-3.5 px-3 whitespace-nowrap space-y-1">
                             <div>
                               <StatusBadge status={f.status} />
                             </div>
@@ -370,13 +370,13 @@ export default function QueuePage() {
                               <SourceBadge source={f.source} />
                             </div>
                             {f.human_review_required && (
-                              <div className="text-[11px] font-medium text-amber-700 dark:text-amber-300">Human Review Flagged</div>
+                              <div className="text-xs font-medium text-amber-700 dark:text-amber-300">Human Review Flagged</div>
                             )}
                           </td>
-                          <td className="py-3.5 px-4 text-right whitespace-nowrap">
+                          <td className="py-3.5 px-3 text-right whitespace-nowrap">
                             <Link
                               href={`/issues/${iss.issue_id}`}
-                              className="inline-flex items-center px-2.5 py-1 rounded-lg bg-slate-900 text-white text-xs font-medium hover:bg-slate-800 dark:bg-sky-500 dark:text-slate-950 dark:hover:bg-sky-400"
+                              className="inline-flex items-center px-3 py-1.5 rounded-lg bg-slate-900 text-white text-sm font-medium hover:bg-slate-800 dark:bg-sky-500 dark:text-slate-950 dark:hover:bg-sky-400"
                             >
                               Review
                             </Link>
