@@ -11,8 +11,8 @@ from app.pipeline import parse_snapshot, run_rules
 from app.schemas import ActionCode, Channel, Department, IssueStatus, Urgency
 
 PROJECT_DIR = Path(__file__).resolve().parents[2]
-SUPPLIED_BOOKINGS = PROJECT_DIR / "assignment_data" / "booking_register.csv"
-SUPPLIED_INBOX = PROJECT_DIR / "assignment_data" / "shift_inbox.csv"
+SUPPLIED_BOOKINGS = PROJECT_DIR / "shift_data" / "booking_register.csv"
+SUPPLIED_INBOX = PROJECT_DIR / "shift_data" / "shift_inbox.csv"
 HARDER_DIR = PROJECT_DIR / "backend" / "evaluation" / "harder_cases"
 
 

@@ -20,7 +20,7 @@ def _make_client(tmp_path: Path, api_key: str = "") -> TestClient:
         database_url=f"sqlite:///{(tmp_path / 'test.db').as_posix()}",
         max_upload_bytes=2048,
         ai_run_cooldown_seconds=0,
-        data_dir=PROJECT_DIR / "assignment_data",
+        data_dir=PROJECT_DIR / "shift_data",
         evaluation_dir=PROJECT_DIR / "backend" / "evaluation",
         artifacts_dir=tmp_path / "artifacts",
     )

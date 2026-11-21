@@ -8,8 +8,8 @@ from app.modules.ingestion import ingest, ingest_files
 from app.pipeline import parse_snapshot
 
 PROJECT_DIR = Path(__file__).resolve().parents[2]
-SUPPLIED_BOOKINGS = PROJECT_DIR / "assignment_data" / "booking_register.csv"
-SUPPLIED_INBOX = PROJECT_DIR / "assignment_data" / "shift_inbox.csv"
+SUPPLIED_BOOKINGS = PROJECT_DIR / "shift_data" / "booking_register.csv"
+SUPPLIED_INBOX = PROJECT_DIR / "shift_data" / "shift_inbox.csv"
 
 
 def test_supplied_inbox_groups_into_eight_issues_and_merges_sales_handoff() -> None:

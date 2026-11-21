@@ -26,8 +26,8 @@ def _resolve_data_dir() -> Path:
     env_dir = os.getenv("DATA_DIR", "").strip()
     if env_dir:
         return Path(env_dir)
-    if (PROJECT_DIR / "assignment_data").exists():
-        return PROJECT_DIR / "assignment_data"
+    if (PROJECT_DIR / "shift_data").exists():
+        return PROJECT_DIR / "shift_data"
     return BACKEND_DIR / "data"
 
 

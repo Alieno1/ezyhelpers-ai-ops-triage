@@ -200,8 +200,8 @@ def main() -> None:
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     settings = get_settings()
     snap = settings.snapshot_time_ist
-    sup_b = PROJECT_DIR / "assignment_data" / "booking_register.csv"
-    sup_i = PROJECT_DIR / "assignment_data" / "shift_inbox.csv"
+    sup_b = PROJECT_DIR / "shift_data" / "booking_register.csv"
+    sup_i = PROJECT_DIR / "shift_data" / "shift_inbox.csv"
     sup_exp = PROJECT_DIR / "backend" / "evaluation" / "expected_actions.json"
 
     hard_b = PROJECT_DIR / "backend" / "evaluation" / "harder_cases" / "booking_register.csv"
