@@ -57,7 +57,7 @@ class OpenRouterClient:
         }
 
     def chat(self, messages: list[dict[str, Any]], json_schema: dict[str, Any] | None = None, issue_id: str | None = None,
-             max_tokens: int = 1500) -> LLMCallRecord:
+             max_tokens: int = 3500) -> LLMCallRecord:
         rec = LLMCallRecord(call_id=uuid.uuid4().hex[:12], issue_id=issue_id, ok=False, provider=self.provider,
                             model_requested=self.model, started_at=datetime.now(timezone.utc).isoformat(), duration_ms=0,
                             attempts=0, request_messages=messages, simulated=self.simulated)

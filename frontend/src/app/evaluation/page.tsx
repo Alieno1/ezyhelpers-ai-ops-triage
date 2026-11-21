@@ -122,7 +122,7 @@ export default function EvaluationPage() {
                   : "bg-amber-50 text-amber-800 border border-amber-200 dark:bg-amber-950/70 dark:text-amber-300 dark:border-amber-800"
                   }`}
               >
-                {m.status === "pending_credentials" ? "Pending Key" : m.status}
+                {m.status === "pending_credentials" ? "Pending Key" : m.status === "not_run" ? "Ready to Run" : m.status}
               </span>
             </div>
 

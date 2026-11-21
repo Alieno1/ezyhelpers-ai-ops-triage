@@ -26,7 +26,7 @@ class MethodMetrics(BaseModel):
     variant: str
     label: str
     mode: Literal["rules", "ai"]
-    status: Literal["evaluated", "pending_credentials", "failed"] = "evaluated"
+    status: Literal["evaluated", "pending_credentials", "not_run", "failed"] = "evaluated"
     note: str = ""
     model: str | None = None
     total_cases: int = 0
@@ -378,15 +378,21 @@ def run_full_evaluation_with_run(
         ]
     else:
         model_name = client.model if client else "google/gemini-2.5-flash"
+        has_key = bool(client and client.api_key and not client.simulated)
         methods.append(MethodMetrics(
             variant=f"ai_{ai_prompt_version}_live",
             label=f"AI-Assisted OpenRouter ({model_name})",
             mode="ai",
-            status="pending_credentials",
+            status="not_run" if has_key else "pending_credentials",
             model=model_name,
             total_cases=len(cases),
-            note=("OPENROUTER_API_KEY is not configured in the backend environment. "
-                  "Live OpenRouter execution is marked pending — no simulated or fabricated model output is included."),
+            note=(
+                "OpenRouter is configured. Click 'Evaluate Live AI' (or call POST /api/processing/evaluate?include_ai=true) "
+                "to execute live model evaluation — no simulated output is included."
+                if has_key
+                else "OPENROUTER_API_KEY is not configured in the backend environment. "
+                     "Live OpenRouter execution is marked pending — no simulated or fabricated model output is included."
+            ),
         ))
 
     rows: list[CaseComparisonRow] = []

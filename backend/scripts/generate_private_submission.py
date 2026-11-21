@@ -355,9 +355,13 @@ cd backend
         ["Shift Snapshot", "Monday, 23 November 2026 · 09:00 IST (Bengaluru Duty Desk)"],
         ["Supplied Inputs", "booking_register.csv (6 bookings) · shift_inbox.csv (12 messages)"],
         ["Architecture", "Next.js 15 + FastAPI + Pydantic v2 + SQLAlchemy (SQLite/Postgres) + OpenRouter"],
+        ["Live Dashboard", "https://ezyhelpers-ai-ops-triage.vercel.app"],
+        ["Live API & Docs", "https://ezyhelpers-triage-api.onrender.com/docs"],
+        ["GitHub Repo", "https://github.com/Alieno1/ezyhelpers-ai-ops-triage"],
         ["Primary Evaluation", sup_summary_line],
         ["Harder Synthetic Set", hard_summary_line],
         ["Live LLM Status", live_llm_status_line],
+        ["Time Spent", "~4 hours active build, live evaluation, documentation & cloud deploy"],
         ["Confidentiality", "Private deliverable — excluded from Git, Vercel, and Render"],
     ], [45 * mm, 125 * mm], f_reg, f_bold)
     story.append(cover_meta)
@@ -415,6 +419,18 @@ cd backend
             p(f"{f.action_code.value}: {f.next_action}\nMissing: {miss}"),
         ])
     story.append(_styled_table(q_rows, [11 * mm, 18 * mm, 18 * mm, 18 * mm, 18 * mm, 16 * mm, 71 * mm], f_reg, f_bold))
+    story.append(Spacer(1, 3 * mm))
+    story.append(p("Draft Responses / Hold Reasons & Human Review Flags (Drafts Only — Never Auto-Sent)", ParagraphStyle("H2", parent=st_h1, fontSize=10.5, leading=14)))
+    draft_rows = [["Rank", "Issue / Bk", "Review Flags / Human Corrections", "Draft Response or Reason to Hold Contact"]]
+    for iss in run_s.issues:
+        f = iss.final
+        rev_txt = ("REVIEW: " + "; ".join(f.human_review_reasons)) if f.human_review_required and f.human_review_reasons else ("REVIEW REQUIRED" if f.human_review_required else "No flag (coordinator approves draft)")
+        draft_txt = f.draft_response if f.draft_response else f"[HOLD CONTACT] {f.hold_contact_reason or 'No contact needed.'}"
+        draft_rows.append([
+            str(f.priority_rank), f"{iss.issue_id}\n{iss.group.booking_id or '-'}",
+            p(rev_txt), p(draft_txt),
+        ])
+    story.append(_styled_table(draft_rows, [11 * mm, 18 * mm, 50 * mm, 91 * mm], f_reg, f_bold))
 
     # 13. First callback and evidence
     story.append(p("13. First Callback and Evidence", st_h1))
@@ -492,7 +508,7 @@ cd backend
     story.append(p("27. Assumptions and Limitations", st_h1))
     story.append(p("Dataset size (n=8 supplied, n=6 synthetic) is illustrative rather than statistically significant; time estimates are operational assumptions; openrouter/free routes dynamically across heterogeneous free models (including reasoning models that consume max_tokens)."))
     story.append(p("28. Reproduction Instructions", st_h1))
-    story.append(p("1) cd backend && .venv/bin/pytest -v (20 passed). 2) .venv/bin/python -m app.cli evaluate --dataset supplied --include-ai. 3) Start uvicorn app.main:app on :8000 and Next.js on :3000."))
+    story.append(p("Live Cloud: Open https://ezyhelpers-ai-ops-triage.vercel.app (API docs at https://ezyhelpers-triage-api.onrender.com/docs; repo at https://github.com/Alieno1/ezyhelpers-ai-ops-triage). Local: 1) cd backend && .venv/bin/pytest -v (20 passed). 2) .venv/bin/python -m app.cli evaluate --dataset supplied --include-ai. 3) Start uvicorn app.main:app on :8000 and Next.js on :3000."))
     story.append(p("29. Conclusion", st_h1))
     story.append(p("The system demonstrates practical production judgment: isolating deterministic facts and business guardrails from probabilistic language interpretation, handling missing data and model outages gracefully, measuring an objective before/after improvement (7/8 -> 8/8; 5/6 -> 6/6; 0 promises), and handing a safe, auditable triage desk to human coordinators."))
 

@@ -196,7 +196,7 @@ export interface MethodMetrics {
   variant: string;
   label: string;
   mode: "rules" | "ai";
-  status: "evaluated" | "pending_credentials" | "failed";
+  status: "evaluated" | "pending_credentials" | "not_run" | "failed";
   note: string;
   model: string | null;
   total_cases: number;

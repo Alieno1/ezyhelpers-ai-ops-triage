@@ -2,6 +2,13 @@
 
 > **"Who gets the first callback?"** — An evidence-backed, rule-enforced AI operations triage workbench for the 9:00 AM Bengaluru duty desk shift.
 
+## Live Cloud Deployment & Time Spent
+
+- **Live Coordinator Dashboard (Vercel):** https://ezyhelpers-ai-ops-triage.vercel.app
+- **Live Backend API (Render + Neon PostgreSQL):** https://ezyhelpers-triage-api.onrender.com ([`/health`](https://ezyhelpers-triage-api.onrender.com/health) · [`/docs`](https://ezyhelpers-triage-api.onrender.com/docs))
+- **Source Repository (GitHub):** https://github.com/Alieno1/ezyhelpers-ai-ops-triage
+- **Time Spent:** ~4 hours active implementation, live OpenRouter evaluation, documentation, and cloud deployment *(note: Render Free tier wakes from idle in ~50s on the first request)*.
+
 ## Project Overview & Exact Problem Statement
 
 At **09:00 AM IST on Monday, 23 November 2026** in Bengaluru, 12 incoming messages and internal notes arrive across customer WhatsApp threads, a Sales handoff, and a call note (`shift_inbox.csv`), alongside 6 booking records (`booking_register.csv`). Only **one coordinator** is free to make a call.
@@ -101,7 +108,7 @@ All 20 tests run against isolated temporary SQLite databases and `httpx.MockTran
 ## Deployment Instructions
 
 - **Backend (Render + optional Neon PostgreSQL):** Blueprint defined in [`render.yaml`](render.yaml) (`rootDir: backend`, `buildCommand: pip install -r requirements.txt`, `startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT`, `healthCheckPath: /health`). Set `OPENROUTER_API_KEY`, `DATABASE_URL`, and `CORS_ORIGINS` (your Vercel URL) in Render secrets.
-- **Frontend (Vercel):** Set Root Directory to `frontend`, Framework Preset `Next.js`, Build Command `npm run build`, and environment variable `NEXT_PUBLIC_API_URL=https://<your-render-service>.onrender.com`. `.vercelignore` excludes `private_submission/` and `.pdf` assets.
+- **Frontend (Vercel):** Set Root Directory to `frontend`, Framework Preset `Next.js`, Build Command `npm run build`, and environment variable `NEXT_PUBLIC_API_URL=https://ezyhelpers-triage-api.onrender.com`. `.vercelignore` excludes `private_submission/` and `.pdf` assets.
 
 ## Known Limitations
 
