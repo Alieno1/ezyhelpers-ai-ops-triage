@@ -40,3 +40,142 @@ body {
   -webkit-font-smoothing: antialiased;
   transition: background-color 150ms ease, color 150ms ease;
 }
+
+/* EzyHelpers SaaS Splash Screen Animations */
+[data-splash="skip"] .eh-splash-root {
+  display: none !important;
+}
+
+@keyframes ehSplashLogoIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.9) translateY(10px);
+    filter: blur(4px);
+  }
+  65% {
+    opacity: 1;
+    filter: blur(0);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    filter: blur(0);
+  }
+}
+
+@keyframes ehSplashGlowPulse {
+  0% {
+    opacity: 0.45;
+    transform: scale(0.92);
+  }
+  100% {
+    opacity: 0.85;
+    transform: scale(1.06);
+  }
+}
+
+@keyframes ehSplashLightSweep {
+  0% {
+    transform: translateX(-140%);
+  }
+  100% {
+    transform: translateX(140%);
+  }
+}
+
+@keyframes ehSplashFadeUp {
+  0% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ehSpinnerRotate {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes ehSpinnerDash {
+  0% {
+    stroke-dasharray: 8, 95;
+    stroke-dashoffset: 0;
+  }
+  50% {
+    stroke-dasharray: 64, 95;
+    stroke-dashoffset: -24;
+  }
+  100% {
+    stroke-dasharray: 8, 95;
+    stroke-dashoffset: -94;
+  }
+}
+
+.eh-splash-logo-wrap {
+  animation: ehSplashLogoIn 680ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.eh-splash-glow {
+  animation: ehSplashGlowPulse 2.4s ease-in-out 180ms infinite alternate both;
+}
+
+.eh-splash-sweep {
+  -webkit-mask-image: url("/ezyhelpers-splash-logo.png");
+  mask-image: url("/ezyhelpers-splash-logo.png");
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+}
+
+.eh-splash-sweep::before {
+  content: "";
+  position: absolute;
+  inset: -12% -45%;
+  background: linear-gradient(
+    108deg,
+    transparent 24%,
+    rgba(56, 189, 248, 0.38) 42%,
+    rgba(255, 255, 255, 0.9) 50%,
+    rgba(37, 99, 235, 0.34) 58%,
+    transparent 76%
+  );
+  animation: ehSplashLightSweep 1.15s cubic-bezier(0.25, 0.8, 0.25, 1) 340ms both;
+}
+
+.eh-splash-status {
+  animation: ehSplashFadeUp 500ms cubic-bezier(0.16, 1, 0.3, 1) 240ms both;
+}
+
+.eh-spinner-svg {
+  animation: ehSpinnerRotate 1.2s linear infinite;
+}
+
+.eh-spinner-arc {
+  animation: ehSpinnerDash 1.45s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .eh-splash-logo-wrap,
+  .eh-splash-glow,
+  .eh-splash-status,
+  .eh-spinner-svg,
+  .eh-spinner-arc,
+  .eh-splash-sweep::before {
+    animation: none !important;
+    transition: none !important;
+    filter: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+
+  .eh-splash-sweep::before {
+    opacity: 0 !important;
+  }
+}

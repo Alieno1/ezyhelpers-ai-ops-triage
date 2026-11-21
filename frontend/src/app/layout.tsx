@@ -4,6 +4,7 @@ import "./globals.css";
 import { DatasetProvider } from "@/components/DatasetContext";
 import { ThemeProvider } from "@/components/ThemeContext";
 import { AppShell } from "@/components/AppShell";
+import { SplashScreen } from "@/components/SplashScreen";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -20,6 +21,8 @@ export const metadata: Metadata = {
   description: "Evidence-backed AI & deterministic operations triage workbench for EzyHelpers Bengaluru.",
 };
 
+const SPLASH_PREPAINT_SCRIPT = `(function(){try{if(sessionStorage.getItem('eh_splash_seen')==='1'&&!/[?&]splash=1(?:&|$)/.test(location.search)){document.documentElement.dataset.splash='skip';}}catch(e){}})();`;
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -27,10 +30,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: SPLASH_PREPAINT_SCRIPT }} />
+      </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <ThemeProvider>
           <DatasetProvider>
-            <AppShell>{children}</AppShell>
+            <SplashScreen>
+              <AppShell>{children}</AppShell>
+            </SplashScreen>
           </DatasetProvider>
         </ThemeProvider>
       </body>
