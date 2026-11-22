@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { Activity, BookOpen, Download, FileSpreadsheet, FileText } from "lucide-react";
 import { useDataset } from "@/components/DatasetContext";
-import { ErrorBanner, LoadingPanel } from "@/components/ui";
+import { ErrorBanner, LoadingPanel, formatLogError, formatShortTime } from "@/components/ui";
 import { exportUrl, getModelStatus } from "@/lib/api";
 import type { ModelStatusResponse } from "@/lib/types";
 
@@ -162,9 +162,10 @@ export default function ExportsAndModelPage() {
               Recorded LLM Execution Log ({status.recent_calls.length} recent calls)
             </div>
             <div className="overflow-x-auto border border-slate-200 dark:border-slate-800 rounded-lg">
-              <table className="w-full min-w-[780px] text-left border-collapse text-xs">
+              <table className="w-full min-w-[920px] text-left border-collapse text-xs">
                 <thead>
                   <tr className="bg-slate-50 border-b border-slate-200 dark:bg-slate-800/70 dark:border-slate-800 text-slate-500 dark:text-slate-400 uppercase">
+                    <th className="py-2 px-3">Timestamp</th>
                     <th className="py-2 px-3">Call ID</th>
                     <th className="py-2 px-3">Issue</th>
                     <th className="py-2 px-3">Status</th>
@@ -178,13 +179,16 @@ export default function ExportsAndModelPage() {
                 <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
                   {status.recent_calls.length === 0 ? (
                     <tr>
-                      <td colSpan={8} className="py-5 text-center text-slate-500 dark:text-slate-400">
+                      <td colSpan={9} className="py-5 text-center text-slate-500 dark:text-slate-400">
                         No OpenRouter execution attempts logged yet. Click &ldquo;Run OpenRouter AI&rdquo; on Overview to test live execution or verify graceful fallback.
                       </td>
                     </tr>
                   ) : (
                     status.recent_calls.map((c) => (
                       <tr key={c.call_id}>
+                        <td className="py-2 px-3 font-mono text-slate-500 dark:text-slate-400 whitespace-nowrap" title={c.started_at}>
+                          {formatShortTime(c.started_at)}
+                        </td>
                         <td className="py-2 px-3 font-mono whitespace-nowrap">{c.call_id}</td>
                         <td className="py-2 px-3 font-mono whitespace-nowrap">{c.issue_id || "-"}</td>
                         <td className="py-2 px-3 whitespace-nowrap">
@@ -196,7 +200,12 @@ export default function ExportsAndModelPage() {
                         <td className="py-2 px-3 font-mono whitespace-nowrap">{c.total_tokens ?? "-"}</td>
                         <td className="py-2 px-3 font-mono whitespace-nowrap">{c.cost_usd !== null ? `$${c.cost_usd.toFixed(6)}` : "-"}</td>
                         <td className="py-2 px-3 font-mono whitespace-nowrap">{c.duration_ms}ms</td>
-                        <td className="py-2 px-3 text-slate-600 dark:text-slate-300 max-w-xs break-words">{c.error_type ? `${c.error_type}: ${c.error_message}` : "-"}</td>
+                        <td
+                          className="py-2 px-3 text-slate-600 dark:text-slate-300 max-w-xs break-words"
+                          title={c.error_type ? `${c.error_type}: ${c.error_message || ""}` : c.error_message || undefined}
+                        >
+                          {formatLogError(c.error_type, c.error_message)}
+                        </td>
                       </tr>
                     ))
                   )}

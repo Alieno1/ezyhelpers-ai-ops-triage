@@ -3,7 +3,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { RotateCcw, Upload } from "lucide-react";
 import { useDataset } from "@/components/DatasetContext";
-import { ErrorBanner, LoadingPanel, SeverityBadge, StatCard, SuccessBanner } from "@/components/ui";
+import { ErrorBanner, LoadingPanel, SeverityBadge, StatCard, SuccessBanner, formatShortTime } from "@/components/ui";
 import { getQualityReport, resetDataset, uploadCsv } from "@/lib/api";
 import type { DQIssue } from "@/lib/types";
 
@@ -151,7 +151,14 @@ export default function DataQualityPage() {
 
           <div className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 shadow-xs overflow-hidden">
             <div className="px-4 py-3 border-b border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-800/70 flex flex-wrap items-center justify-between gap-2">
-              <h2 className="text-base font-bold text-slate-900 dark:text-slate-100">Data-Quality Findings ({filtered.length})</h2>
+              <div>
+                <h2 className="text-base font-bold text-slate-900 dark:text-slate-100">Data-Quality Findings ({filtered.length})</h2>
+                {data.updated_at && (
+                  <div className="text-xs text-slate-500 dark:text-slate-400 font-mono mt-0.5" title={data.updated_at}>
+                    Last updated: {formatShortTime(data.updated_at)}
+                  </div>
+                )}
+              </div>
               <select
                 aria-label="Filter severity"
                 value={severityFilter}

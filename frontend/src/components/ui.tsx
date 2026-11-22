@@ -129,10 +129,27 @@ export function formatShortTime(iso: string): string {
     month: "short",
     hour: "2-digit",
     minute: "2-digit",
-    timeZone: "UTC",
+    second: "2-digit",
+    timeZone: "Asia/Kolkata",
     hour12: false,
   }).format(d);
-  return `${formatted} UTC`;
+  return `${formatted} IST`;
+}
+
+export function formatLogError(errorType: string | null, errorMessage: string | null): string {
+  if (!errorType && !errorMessage) return "-";
+  let clean = (errorMessage || "").trim();
+  if (clean.startsWith("{")) {
+    try {
+      const parsed = JSON.parse(clean) as { error?: { message?: string }; message?: string };
+      clean = parsed?.error?.message || parsed?.message || clean;
+    } catch {
+      const m = clean.match(/"message"\s*:\s*"([^"]+)"/);
+      if (m?.[1]) clean = m[1];
+    }
+  }
+  const combined = errorType ? (clean ? `${errorType}: ${clean}` : errorType) : clean;
+  return combined.length > 160 ? `${combined.slice(0, 157)}...` : combined;
 }
 
 export function StatCard({

@@ -5,7 +5,7 @@ import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAx
 import { CheckCircle2, FlaskConical, RefreshCw, XCircle } from "lucide-react";
 import { useDataset } from "@/components/DatasetContext";
 import { useTheme } from "@/components/ThemeContext";
-import { ErrorBanner, LoadingPanel } from "@/components/ui";
+import { ErrorBanner, LoadingPanel, formatShortTime } from "@/components/ui";
 import { getLatestEvaluation, getModelStatus, runEvaluation } from "@/lib/api";
 import type { EvaluationReport } from "@/lib/types";
 
@@ -107,7 +107,10 @@ export default function EvaluationPage() {
         <div className="min-w-0">
           <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100">Rules vs AI Evaluation</h1>
           <p className="text-sm text-slate-500 dark:text-slate-400 break-words">
-            Evaluated against {report.total_cases} pre-defined benchmark cases (<code className="font-mono">{report.expected_file}</code>).
+            Evaluated against {report.total_cases} pre-defined benchmark cases (<code className="font-mono">{report.expected_file}</code>)
+            {report.evaluated_at && (
+              <span title={report.evaluated_at}> · Last evaluated: <strong className="text-slate-700 dark:text-slate-300">{formatShortTime(report.evaluated_at)}</strong></span>
+            )}.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
