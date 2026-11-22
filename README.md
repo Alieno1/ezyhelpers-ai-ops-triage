@@ -30,7 +30,7 @@ This system groups the 12 messages into **8 distinct customer issues**, reconcil
 - **Backend:** Python 3.14, FastAPI, Pydantic v2, SQLAlchemy 2.x, HTTPX, Pandas, OpenPyXL, ReportLab
 - **Database:** SQLite locally (`backend/triage.db`); PostgreSQL-compatible via `DATABASE_URL`
 - **AI Gateway:** OpenRouter (`/api/v1/chat/completions`, configurable model via `OPENROUTER_MODEL`)
-- **Testing:** Pytest (20 automated unit, integration, guardrail, fallback, evaluation, and API tests)
+- **Testing:** Pytest (22 automated unit, integration, guardrail, fallback, evaluation, and API tests)
 
 ## Architecture Overview
 
@@ -103,7 +103,7 @@ Or upload new `booking_register.csv` / `shift_inbox.csv` files directly in the *
 cd backend
 .venv/bin/pytest -v
 ```
-All 20 tests run against isolated temporary SQLite databases and `httpx.MockTransport` mocks (explicitly flagged `simulated=True`), covering ingestion, UTF-8 BOM, missing/invalid data, grouping, rules R1–R11, promise detection, LLM repair/timeout/429/404 fallbacks, failed-AI scoring, human review re-ranking, exports, and security checks.
+All 22 tests run against isolated temporary SQLite databases and `httpx.MockTransport` mocks (explicitly flagged `simulated=True`), covering ingestion, UTF-8 BOM, missing/invalid data, grouping, rules R1–R11, promise detection, LLM repair/timeout/429/404 fallbacks, failed-AI scoring, human review re-ranking, exports, and security checks.
 
 ## Deployment Instructions
 
@@ -112,6 +112,6 @@ All 20 tests run against isolated temporary SQLite databases and `httpx.MockTran
 
 ## Known Limitations
 
-- **Free-Tier OpenRouter Variability:** Live execution on `openrouter/free` (`max_tokens=3500`) completed **`7/8`** supplied (`30,520` tokens, `$0.00`) and **`4/6`** harder issues across free models (`nvidia/nemotron-3.5-lightning:free`, `nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free`, `particle-ai/particle-1:free`), while remaining heavy reasoning truncations (`recursive/flint-v1.0:free`) triggered automatic `rules_fallback` (`8/8` final queue, `0` unsupported promises). Paid non-reasoning models such as `google/gemini-2.5-flash` avoid reasoning-token truncation when funded.
+- **Free-Tier OpenRouter Variability & Daily Quota:** With hidden reasoning disabled by default (`reasoning: {"enabled": false}`) and deterministic guardrails (`guard_ai`), live execution on `openrouter/free` completed **`8/8`** supplied (`21,712` tokens, `64.1s`, `$0.00`) and **`6/6`** harder issues (`21,908` tokens, `103.0s`, `$0.00`) across free models (`nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free`, `nvidia/nemotron-3-ultra-550b-a55b:free`, `particle-ai/particle-1:free`, `nvidia/nemotron-3.5-super-vl:free`, `nvidia/nemotron-3.5-lightning:free`, `recursive/flint-v1.0:free`) with **`0`** unsupported promises. However, OpenRouter's free tier is capped at **50 requests/day** without account credits and still exhibits higher latency variability than funded endpoints; when free-tier limits or timeouts occur, `rules_fallback` preserves the complete `8/8` coordinator queue. Production deployments should pin a funded non-reasoning model such as `google/gemini-2.5-flash`.
 - **Small Evaluation Sample:** The supplied shift has 12 messages (`n=8` distinct issues), supplemented by `n=6` synthetic harder edge cases; metrics demonstrate deterministic behavior and guardrail coverage, not statistical significance.
 - **External Integration Scope:** Outgoing replies are intentionally draft-only; WhatsApp Business API sending and live CRM write-backs are out of scope for safety.

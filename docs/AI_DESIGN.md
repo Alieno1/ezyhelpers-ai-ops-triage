@@ -9,17 +9,16 @@
 
 ## Live OpenRouter Execution Findings (Actual Measured Runs)
 
-Three live OpenRouter experiments were executed during verification (zero results fabricated):
+Three live OpenRouter configurations were tested during verification (zero results fabricated):
 
 1. **`google/gemini-2.5-flash`:** Returned HTTP `402 insufficient_credits` (*"requested up to 1500 tokens, but can only afford 314"*); all 8 calls logged and fell back cleanly to `rules_fallback`.
 2. **`google/gemma-4-31b-it:free`:** Returned HTTP `429 rate_limited` (*"temporarily rate-limited upstream"*); all 8 calls retried within policy, logged, and fell back to `rules_fallback`.
-3. **`openrouter/free` (Active Configured Model):**
-   - **Initial run (`max_tokens=1500`):** `2/8` supplied (`23,546` tok, `169,780 ms`, `$0.00`; `particle-ai/particle-1:free`, `baidu/ernie-5.5-flash-preview:free`) and `2/6` harder (`17,407` tok, `85,095 ms`, `$0.00`), because 6/8 supplied calls truncated inside reasoning tokens.
-   - **Updated run after raising `max_tokens=3500` (live on Render):**
-     - **Supplied Shift (`n=8`):** **`7/8`** issues succeeded end-to-end on OpenRouter (`nvidia/nemotron-3.5-lightning:free`, `nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free`, `particle-ai/particle-1:free`); `1/8` (`ISS-06`/`B105`) truncated at `5,013` tokens on `recursive/flint-v1.0:free` -> `rules_fallback`. Guardrails fixed 3 urgency errors (`4/8 -> 7/8`) with `0` unsupported promises.
-       - **Total Tokens:** `30,520` | **Total Duration:** `155,823 ms` | **Actual Cost:** `$0.00`
-     - **Harder Synthetic Set (`n=6`):** **`4/6`** issues succeeded (`nvidia/nemotron-3.5-lightning:free`, `recursive/flint-v1.0:free`, `nvidia/nemotron-3-ultra-550b-a55b:free`); `2/6` (`ISS-03`, `ISS-04`) truncated on `recursive/flint-v1.0:free` -> `rules_fallback`. Guardrails blocked **`1` unsupported `revised_time` promise** on `H02` (`1 -> 0` promises) and fixed urgency (`3/6 -> 4/6`).
-       - **Total Tokens:** `24,376` | **Total Duration:** `191,852 ms` | **Actual Cost:** `$0.00`
+3. **`openrouter/free` (Active Configured Model — `reasoning: {"enabled": false}`, `max_tokens=3500`):**
+   - Because structured triage JSON requires `~280–350` output tokens rather than verbose chain-of-thought reasoning, [`backend/app/modules/llm_client.py`](../backend/app/modules/llm_client.py) passes `"reasoning": {"enabled": false}` by default (with automatic router retry on HTTP `400` and a single truncation retry on `finish_reason == "length"`):
+   - **Supplied Shift (`n=8`):** **`8/8`** API calls succeeded end-to-end across free models (`nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free`, `nvidia/nemotron-3-ultra-550b-a55b:free`, `particle-ai/particle-1:free`, `nvidia/nemotron-3.5-super-vl:free`). Raw AI scored `7/8` (missing `whatsapp` channel + rate card on `M05` and setting `medium` urgency on `M10`); deterministic guardrails (`ai_v1_guarded`) corrected all deviations to **`8/8`** across actions, department, urgency, and missing info with **`0` unsupported promises** and `#1` callback match (`M01, M07`).
+     - **Total Tokens:** `21,712` | **Total Duration:** `64,108 ms` | **Actual Cost:** `$0.00`
+   - **Harder Synthetic Set (`n=6`):** **`6/6`** API calls succeeded (`nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free`, `recursive/flint-v1.0:free`, `nvidia/nemotron-3.5-lightning:free`, `nvidia/nemotron-3-ultra-550b-a55b:free`). Raw AI scored `5/6` (misrouting unlinked `H03` to `Billing` instead of asking for booking identity via `Duty Ops`, and setting `H02` urgency to `low`); deterministic guardrails (`ai_v1_guarded`) enforced `R10` and urgency rules to reach **`6/6`** across all dimensions with **`0` unsupported promises**.
+     - **Total Tokens:** `21,908` | **Total Duration:** `102,978 ms` | **Actual Cost:** `$0.00`
 
 ## System Prompt (`SYSTEM_PROMPT_V1` / `SYSTEM_PROMPT_V2`)
 
