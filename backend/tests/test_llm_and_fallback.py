@@ -15,7 +15,7 @@ from app.modules.ingestion import ingest, ingest_files
 from app.modules.llm_client import OpenRouterClient
 from app.modules.normalisation import redact_pii
 from app.pipeline import parse_snapshot, run_ai
-from app.schemas import ActionCode, Channel, Department
+from app.schemas import ActionCode, Channel, Department, IssueStatus
 
 PROJECT_DIR = Path(__file__).resolve().parents[2]
 SUPPLIED_BOOKINGS = PROJECT_DIR / "shift_data" / "booking_register.csv"
@@ -237,4 +237,168 @@ def test_failed_ai_scores_zero_in_evaluation() -> None:
     assert metrics.correct_next_actions == 0
     assert metrics.first_callback_correct is False
     assert any(d.kind == "ai_failure" for d in disagreements)
+
+
+def test_reasoning_effort_downgrade_and_truncation_retry() -> None:
+    b_csv = (
+        "booking_id,service,locality,scheduled_start_ist,updated_at_ist,operations_record,billing_record\n"
+        "B101,Elder companionship,HSR Layout,2026-11-23 08:00,2026-11-22 18:10,Regular caregiver assigned.,\n"
+    ).encode("utf-8")
+    i_csv = (
+        "event_id,received_at_ist,thread_id,booking_id,channel,sender,message\n"
+        "M01,2026-11-23 08:17,T01,B101,WhatsApp,Customer,Dad caregiver missing.\n"
+    ).encode("utf-8")
+    ing = ingest(b_csv, i_csv, parse_snapshot("2026-11-23 09:00"))
+
+    # 1a. Pinned model strips reasoning immediately on HTTP 400 rejecting reasoning.
+    seen_pinned: list[object] = []
+
+    def strip_pinned_handler(req: httpx.Request) -> httpx.Response:
+        body = json.loads(req.content)
+        seen_pinned.append(body.get("reasoning"))
+        if len(seen_pinned) == 1:
+            return httpx.Response(400, text="Reasoning is mandatory for this endpoint and cannot be disabled.")
+        return httpx.Response(200, json={
+            "model": "baidu/ernie-5.5-flash-preview:free",
+            "choices": [{"finish_reason": "stop", "message": {"content": json.dumps(_valid_ai_json(supporting_source_ids=["M01", "B101"]))}}],
+            "usage": {"prompt_tokens": 100, "completion_tokens": 50, "total_tokens": 150},
+        })
+
+    c_pinned = OpenRouterClient("k", "baidu/ernie-5.5-flash-preview:free", transport=httpx.MockTransport(strip_pinned_handler))
+    r_pinned = run_ai(ing, "2026-11-23 09:00", c_pinned)
+    assert seen_pinned == [{"enabled": False}, None]
+    assert r_pinned.issues[0].ai_status == "ok"
+
+    # 1b. openrouter/free retries once keeping reasoning={"enabled": False} before stripping on a second 400.
+    seen_router: list[object] = []
+
+    def router_retry_handler(req: httpx.Request) -> httpx.Response:
+        body = json.loads(req.content)
+        seen_router.append(body.get("reasoning"))
+        if len(seen_router) <= 2:
+            return httpx.Response(400, text="Reasoning is mandatory for this endpoint and cannot be disabled.")
+        return httpx.Response(200, json={
+            "model": "nvidia/nemotron-3.5-super-vl:free",
+            "choices": [{"finish_reason": "stop", "message": {"content": json.dumps(_valid_ai_json(supporting_source_ids=["M01", "B101"]))}}],
+            "usage": {"prompt_tokens": 100, "completion_tokens": 50, "total_tokens": 150},
+        })
+
+    c_router = OpenRouterClient("k", "openrouter/free", transport=httpx.MockTransport(router_retry_handler))
+    r_router = run_ai(ing, "2026-11-23 09:00", c_router)
+    assert seen_router == [{"enabled": False}, {"enabled": False}, None]
+    assert r_router.issues[0].ai_status == "ok"
+
+    # 2. One finish_reason="length" retries once and accumulates tokens across attempts.
+    trunc_calls = {"n": 0}
+
+    def trunc_then_ok(req: httpx.Request) -> httpx.Response:
+        trunc_calls["n"] += 1
+        if trunc_calls["n"] == 1:
+            return httpx.Response(200, json={
+                "model": "recursive/flint-v1.0:free",
+                "choices": [{"finish_reason": "length", "message": {"content": "{partial"}}],
+                "usage": {"prompt_tokens": 100, "completion_tokens": 500, "total_tokens": 600, "cost": 0.001},
+            })
+        return httpx.Response(200, json={
+            "model": "nvidia/nemotron-3.5-lightning:free",
+            "choices": [{"finish_reason": "stop", "message": {"content": json.dumps(_valid_ai_json(supporting_source_ids=["M01", "B101"]))}}],
+            "usage": {"prompt_tokens": 120, "completion_tokens": 80, "total_tokens": 200, "cost": 0.0},
+        })
+
+    c_retry = OpenRouterClient("k", "openrouter/free", max_retries=2, backoff_base=0.0, transport=httpx.MockTransport(trunc_then_ok))
+    r_retry = run_ai(ing, "2026-11-23 09:00", c_retry)
+    assert trunc_calls["n"] == 2
+    assert r_retry.issues[0].ai_status == "ok"
+    assert r_retry.llm_calls[0].attempts == 2
+    assert r_retry.llm_calls[0].total_tokens == 800
+
+    # 3. Two consecutive finish_reason="length" stop after 2 attempts and fall back cleanly.
+    always_calls = {"n": 0}
+
+    def always_trunc(req: httpx.Request) -> httpx.Response:
+        always_calls["n"] += 1
+        return httpx.Response(200, json={
+            "model": "recursive/flint-v1.0:free",
+            "choices": [{"finish_reason": "length", "message": {"content": "{partial"}}],
+            "usage": {"prompt_tokens": 100, "completion_tokens": 500, "total_tokens": 600},
+        })
+
+    c_fail = OpenRouterClient("k", "openrouter/free", max_retries=2, backoff_base=0.0, transport=httpx.MockTransport(always_trunc))
+    r_fail = run_ai(ing, "2026-11-23 09:00", c_fail)
+    assert always_calls["n"] == 2
+    assert r_fail.issues[0].ai_status == "failed"
+    assert r_fail.issues[0].final.source == "rules_fallback"
+    assert r_fail.llm_calls[0].attempts == 2
+    assert r_fail.llm_calls[0].error_type == "incomplete_response"
+    assert r_fail.llm_calls[0].total_tokens == 1200
+
+
+def test_r9_promotes_resolved_service_gap_and_blocks_negated_closure() -> None:
+    b_csv = (
+        "booking_id,service,locality,scheduled_start_ist,updated_at_ist,operations_record,billing_record\n"
+        "B102,Housekeeping,Bellandur,2026-11-23 08:15,2026-11-23 08:12,Helper assigned. Arrival pending.,\n"
+    ).encode("utf-8")
+
+    # 1. Non-negated arrival confirmation with resolved_by_customer=True and issue_category="service_gap"
+    i_ok = (
+        "event_id,received_at_ist,thread_id,booking_id,channel,sender,message\n"
+        "M02,2026-11-23 08:23,T02,B102,WhatsApp,Customer,Our 8:15 housekeeping shift hasn't started. Can you check?\n"
+        "M08,2026-11-23 08:46,T02,B102,WhatsApp,Customer,\"Aa gayi hain. She is here now, all sorted. Please close this.\"\n"
+    ).encode("utf-8")
+    ing_ok = ingest(b_csv, i_ok, parse_snapshot("2026-11-23 09:00"))
+    ai_close = _valid_ai_json(
+        issue_category="service_gap",
+        resolved_by_customer=True,
+        cover_available="not_applicable",
+        deadline=None,
+        contact_preference="no_preference",
+        contact_channel="none",
+        suggested_urgency="low",
+        recommended_action_code="SERVICE_GAP_CHECK_ARRIVAL",
+        supporting_source_ids=["M02", "M08", "B102"],
+    )
+
+    def ok_handler(req: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, json={
+            "model": "nvidia/nemotron-3.5-lightning:free",
+            "choices": [{"finish_reason": "stop", "message": {"content": json.dumps(ai_close)}}],
+        })
+
+    run_ok = run_ai(ing_ok, "2026-11-23 09:00", OpenRouterClient("k", "openrouter/free", transport=httpx.MockTransport(ok_handler)))
+    iss_ok = run_ok.issues[0]
+    assert iss_ok.final.action_code == ActionCode.CLOSE_CONFIRMED_ARRIVAL
+    assert iss_ok.final.status == IssueStatus.RESOLVED
+    assert iss_ok.final.contact_channel == Channel.NONE
+    assert any(e.rule_id == "R9" for e in iss_ok.final.guardrail_events)
+
+    # 2. Negated closure ("Please don't close, she still hasn't come.") remains blocked and open
+    i_neg = (
+        "event_id,received_at_ist,thread_id,booking_id,channel,sender,message\n"
+        "M02,2026-11-23 08:23,T02,B102,WhatsApp,Customer,Our 8:15 housekeeping shift hasn't started. Can you check?\n"
+        "M08,2026-11-23 08:46,T02,B102,WhatsApp,Customer,\"Please don't close, she still hasn't come.\"\n"
+    ).encode("utf-8")
+    ing_neg = ingest(b_csv, i_neg, parse_snapshot("2026-11-23 09:00"))
+    ai_bad_close = _valid_ai_json(
+        issue_category="arrival_confirmed",
+        resolved_by_customer=True,
+        cover_available="not_applicable",
+        deadline=None,
+        contact_preference="no_preference",
+        contact_channel="none",
+        suggested_urgency="none",
+        recommended_action_code="CLOSE_CONFIRMED_ARRIVAL",
+        supporting_source_ids=["M02", "M08", "B102"],
+    )
+
+    def neg_handler(req: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, json={
+            "model": "nvidia/nemotron-3.5-lightning:free",
+            "choices": [{"finish_reason": "stop", "message": {"content": json.dumps(ai_bad_close)}}],
+        })
+
+    run_neg = run_ai(ing_neg, "2026-11-23 09:00", OpenRouterClient("k", "openrouter/free", transport=httpx.MockTransport(neg_handler)))
+    iss_neg = run_neg.issues[0]
+    assert iss_neg.final.action_code == ActionCode.SERVICE_GAP_CHECK_ARRIVAL
+    assert iss_neg.final.status == IssueStatus.OPEN
+    assert any(e.rule_id == "R9" for e in iss_neg.final.guardrail_events)
 

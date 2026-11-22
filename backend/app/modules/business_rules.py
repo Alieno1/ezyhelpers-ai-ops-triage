@@ -85,6 +85,10 @@ def enforce_signal_constraints(ctx: IssueContext, s: Signals) -> tuple[Signals, 
                            "Closure requires a non-negated arrival confirmation from the family."))
             s.issue_category = Category.CARE_GAP if is_care_service(ctx.booking) else Category.SERVICE_GAP
             s.resolved_by_customer = False
+        elif s.resolved_by_customer and s.issue_category in (Category.CARE_GAP, Category.SERVICE_GAP):
+            events.append(("R9", "issue_category", s.issue_category.value, Category.ARRIVAL_CONFIRMED.value,
+                           "Family confirmed arrival (resolved_by_customer=True); normalized category to arrival_confirmed."))
+            s.issue_category = Category.ARRIVAL_CONFIRMED
     # Contact preference (R3): an explicit 'don't call' in the source text always wins.
     if detect_no_call(all_text) and s.contact_preference != "whatsapp":
         events.append(("R3", "contact_preference", s.contact_preference, "whatsapp", "Source message explicitly asks not to be called."))
