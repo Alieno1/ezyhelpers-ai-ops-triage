@@ -28,6 +28,28 @@ Pause the AI-assisted pilot immediately and revert to manual/rules-only triage i
 | Coordinator human verification, edits & overrides | Included above | ~0.75 min/issue × 8 = **6.0 min** | Quick scan of timeline, register panel, and 1-click approve/edit |
 | **Total Coordinator Time** | **26.0 min / shift** | **6.2 min / shift** | **Net Saved: ~19.8 minutes per 12-message shift (~76% prep reduction)** |
 
+> **Attribution Breakdown (Workflow / `rules_v2` vs. LLM Layer):**
+> - **Manual → Deterministic `rules_v2` workbench (~75–85% of total saving):** Automated grouping, booking register matching, priority ranking, missing-fact surfacing, and policy-safe templates deliver the bulk of the `~19.8 min` shift reduction in `< 1s` at `$0.00`.
+> - **Deterministic `rules_v2` → Guarded AI layer (currently unmeasured):** On known benchmark patterns (`n=8` supplied, `n=6` harder), `rules_v2` already scores `8/8` and `6/6`, so AI adds `~0 min` there. Incremental LLM savings in live operations are expected strictly on long-tail `MANUAL_TRIAGE` vernacular/multi-intent tickets and faster editing of nuanced reply drafts.
+
+## Measuring Incremental AI Time Savings (`Rules-Only` vs. `Rules + Guarded AI`)
+
+To replace assumptions with measured shift telemetry and isolate how much time the AI layer itself saves beyond `rules_v2`, run a **7-day alternating/split-shift A/B comparison** during the pilot:
+
+- **Arm A (`Rules-Only`):** `rules_v2` classification, deterministic priority queue, and rule-enforced holding templates.
+- **Arm B (`Rules-First + Async Guarded AI`):** Immediate `rules_v2` queue render (`< 1s`), with a fast non-reasoning model (e.g., `google/gemini-2.5-flash`) invoked asynchronously for `MANUAL_TRIAGE`, mixed-language/ambiguous threads, and contextual draft replies behind `evidence.py` / `guard_ai`.
+
+Log four timestamps/counters per issue directly in the review workbench:
+
+| Metric | Definition | What It Isolates |
+|---|---|---|
+| `time_to_first_callback_sec` | `09:00` shift open → `#1` urgent call initiated | Verifies AI async execution adds zero delay to urgent callback dispatch |
+| `handle_time_per_issue_sec` | Issue card opened → coordinator `Approve` / `Edit` / `Override` | Direct wall-clock comparison between Arm A and Arm B |
+| `manual_triage_rate` | `%` of incoming issues dropped to `MANUAL_TRIAGE` by `rules_v2` vs. resolved cleanly by AI | Quantifies real-world vernacular/edge-case volume outside regex coverage |
+| `draft_edit_distance` & `override_rate` | Characters edited in draft + `%` priority/dept/action overrides | Separates drafting time saved from coordinator review/correction overhead |
+
+**Pilot Go / No-Go Decision Rule for AI:** Keep AI enabled in the production **Rules-First, AI-on-Exception** path only if Arm B yields a measurable net saving of **`>= 15–20 seconds` per complex/`MANUAL_TRIAGE` issue** (after review overhead) with **`0` unsupported promises**. Otherwise, stay on deterministic `rules_v2` only and avoid unnecessary LLM latency or operational complexity.
+
 ## Estimated Model Cost Per 100 Cases (Transparent Pricing Assumptions)
 
 *(Assumptions using `google/gemini-2.5-flash` placeholder pricing from `.env.example`: `$0.30 / 1M` input tokens, `$2.50 / 1M` output tokens. Actual OpenRouter billing replaces these once executed with a live key.)*
