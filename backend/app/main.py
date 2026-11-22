@@ -86,12 +86,16 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
             b_path, i_path, exp_path = _dataset_paths(settings, ds_name)
             if b_path.exists() and i_path.exists():
                 ing = repo.bootstrap_dataset(ds_name, b_path.read_bytes(), i_path.read_bytes(), settings.snapshot_time_ist)
-                if repo.get_latest_run(ds_name) is None:
-                    run = run_rules(ing, settings.snapshot_time_ist, version="v2", dataset=ds_name)
-                    repo.save_run(run)
+                latest_run = repo.get_latest_run(ds_name)
+                if latest_run is None:
+                    latest_run = run_rules(ing, settings.snapshot_time_ist, version="v2", dataset=ds_name)
+                    repo.save_run(latest_run)
                 if exp_path.exists() and repo.get_latest_evaluation_json(ds_name) is None:
                     rep = run_full_evaluation(ing, settings.snapshot_time_ist, ds_name, exp_path, client=_make_client(settings), include_ai=False)
                     repo.save_evaluation(rep.eval_id, ds_name, rep.model_dump_json(), rep.evaluated_at)
+                repo.list_runs(dataset=ds_name, limit=5)
+                repo.list_reviews(run_id=latest_run.run_id)
+        repo.list_llm_calls(limit=30)
 
     @asynccontextmanager
     async def lifespan(_app: FastAPI):
@@ -291,8 +295,13 @@ def create_app(custom_settings: Settings | None = None) -> FastAPI:
 
     @app.get("/api/data/quality-report")
     def quality_report(dataset: str = Query("supplied", pattern="^(supplied|harder)$")) -> dict[str, Any]:
-        ing, _ = _ensure_dataset_and_run(repo, settings, dataset)
-        _, _, _, updated_at = repo.get_dataset(dataset) or (None, b"", b"", "")
+        ds = repo.get_dataset(dataset)
+        if ds is None:
+            _ensure_dataset_and_run(repo, settings, dataset)
+            ds = repo.get_dataset(dataset)
+        ing, _, _, updated_at = ds or (None, b"", b"", "")
+        if ing is None:
+            raise HTTPException(status_code=404, detail=f"Dataset '{dataset}' not found")
         issues = ing.dq_issues
         return {
             "dataset": dataset,

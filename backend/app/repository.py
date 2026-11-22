@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import time
 from datetime import datetime, timezone
 from typing import Any
 
@@ -16,6 +17,8 @@ from app.schemas import (
     Channel, IngestResult, IssueContext, IssueStatus, LLMCallRecord, ReviewRecord, ReviewRequest, RunResult, Urgency,
 )
 
+_CACHE_TTL_S = 60.0
+
 
 def _now_iso() -> str:
     return datetime.now(timezone.utc).isoformat()
@@ -24,6 +27,13 @@ def _now_iso() -> str:
 class TriageRepository:
     def __init__(self, session_factory: sessionmaker):
         self.session_factory = session_factory
+        self._datasets: dict[str, tuple[float, IngestResult, bytes, bytes, str]] = {}
+        self._runs_by_id: dict[str, tuple[float, RunResult]] = {}
+        self._latest_run: dict[str, tuple[float, RunResult]] = {}
+        self._runs_list: dict[tuple[str | None, int], tuple[float, list[dict[str, Any]]]] = {}
+        self._reviews: dict[tuple[str | None, str | None], tuple[float, list[ReviewRecord]]] = {}
+        self._latest_eval: dict[str, tuple[float, str]] = {}
+        self._llm_calls: dict[int, tuple[float, list[LLMCallRecord]]] = {}
 
     # ---------------------------------------------------------------- datasets
     def save_dataset(self, name: str, bookings_csv: bytes, inbox_csv: bytes, ing: IngestResult) -> None:
@@ -39,13 +49,20 @@ class TriageRepository:
             else:
                 db.add(DatasetRow(name=name, bookings_csv=bookings_csv, inbox_csv=inbox_csv, ingest_json=payload, updated_at=now))
             db.commit()
+        self._datasets[name] = (time.monotonic(), ing.model_copy(deep=True), bookings_csv, inbox_csv, now)
 
     def get_dataset(self, name: str) -> tuple[IngestResult, bytes, bytes, str] | None:
+        cached = self._datasets.get(name)
+        now_t = time.monotonic()
+        if cached and (now_t - cached[0]) < _CACHE_TTL_S:
+            return cached[1].model_copy(deep=True), cached[2], cached[3], cached[4]
         with self.session_factory() as db:
             row = db.get(DatasetRow, name)
             if not row:
                 return None
-            return IngestResult.model_validate_json(row.ingest_json), row.bookings_csv, row.inbox_csv, row.updated_at
+            ing = IngestResult.model_validate_json(row.ingest_json)
+            self._datasets[name] = (now_t, ing.model_copy(deep=True), row.bookings_csv, row.inbox_csv, row.updated_at)
+            return ing, row.bookings_csv, row.inbox_csv, row.updated_at
 
     def bootstrap_dataset(self, name: str, bookings_csv: bytes, inbox_csv: bytes, snapshot: str, force: bool = False) -> IngestResult:
         existing = None if force else self.get_dataset(name)
@@ -103,28 +120,63 @@ class TriageRepository:
                         created_at=call.started_at,
                     ))
             db.commit()
+        now_t = time.monotonic()
+        run_copy = run.model_copy(deep=True)
+        self._runs_by_id[run.run_id] = (now_t, run_copy)
+        self._latest_run[run.dataset] = (now_t, run_copy.model_copy(deep=True))
+        self._runs_list.clear()
+        if run.llm_calls:
+            self._llm_calls.clear()
 
     def get_run(self, run_id: str) -> RunResult | None:
+        cached = self._runs_by_id.get(run_id)
+        now_t = time.monotonic()
+        if cached and (now_t - cached[0]) < _CACHE_TTL_S:
+            return cached[1].model_copy(deep=True)
         with self.session_factory() as db:
             row = db.get(RunRow, run_id)
-            return RunResult.model_validate_json(row.result_json) if row else None
+            if not row:
+                return None
+            res = RunResult.model_validate_json(row.result_json)
+            self._runs_by_id[run_id] = (now_t, res.model_copy(deep=True))
+            return res
 
     def get_latest_run(self, dataset: str = "supplied") -> RunResult | None:
+        cached = self._latest_run.get(dataset)
+        now_t = time.monotonic()
+        if cached and (now_t - cached[0]) < _CACHE_TTL_S:
+            return cached[1].model_copy(deep=True)
         with self.session_factory() as db:
             stmt = select(RunRow).where(RunRow.dataset == dataset).order_by(desc(RunRow.finished_at)).limit(1)
             row = db.scalars(stmt).first()
-            return RunResult.model_validate_json(row.result_json) if row else None
+            if not row:
+                return None
+            res = RunResult.model_validate_json(row.result_json)
+            self._latest_run[dataset] = (now_t, res.model_copy(deep=True))
+            self._runs_by_id[res.run_id] = (now_t, res.model_copy(deep=True))
+            return res
 
     def list_runs(self, dataset: str | None = None, limit: int = 20) -> list[dict[str, Any]]:
+        key = (dataset, limit)
+        cached = self._runs_list.get(key)
+        now_t = time.monotonic()
+        if cached and (now_t - cached[0]) < _CACHE_TTL_S:
+            return [dict(r) for r in cached[1]]
         with self.session_factory() as db:
-            stmt = select(RunRow).order_by(desc(RunRow.finished_at)).limit(limit)
+            cols = (
+                RunRow.run_id, RunRow.dataset, RunRow.mode, RunRow.variant,
+                RunRow.model, RunRow.status, RunRow.started_at, RunRow.finished_at,
+            )
+            stmt = select(*cols).order_by(desc(RunRow.finished_at)).limit(limit)
             if dataset:
-                stmt = select(RunRow).where(RunRow.dataset == dataset).order_by(desc(RunRow.finished_at)).limit(limit)
-            rows = db.scalars(stmt).all()
-            return [{
+                stmt = select(*cols).where(RunRow.dataset == dataset).order_by(desc(RunRow.finished_at)).limit(limit)
+            rows = db.execute(stmt).all()
+            out = [{
                 "run_id": r.run_id, "dataset": r.dataset, "mode": r.mode, "variant": r.variant,
                 "model": r.model, "status": r.status, "started_at": r.started_at, "finished_at": r.finished_at,
             } for r in rows]
+            self._runs_list[key] = (now_t, [dict(r) for r in out])
+            return out
 
     def last_ai_run_time(self, dataset: str | None = None) -> datetime | None:
         with self.session_factory() as db:
@@ -250,9 +302,20 @@ class TriageRepository:
                 review_id=rev_row.review_id, issue_id=issue_id, run_id=run_id, created_at=created_at,
                 before=before, **req.model_dump(),
             )
+            now_t = time.monotonic()
+            self._runs_by_id[run_id] = (now_t, run.model_copy(deep=True))
+            latest_cached = self._latest_run.get(run.dataset)
+            if latest_cached and latest_cached[1].run_id == run_id:
+                self._latest_run[run.dataset] = (now_t, run.model_copy(deep=True))
+            self._reviews.clear()
             return run, record
 
     def list_reviews(self, run_id: str | None = None, issue_id: str | None = None) -> list[ReviewRecord]:
+        key = (run_id, issue_id)
+        cached = self._reviews.get(key)
+        now_t = time.monotonic()
+        if cached and (now_t - cached[0]) < _CACHE_TTL_S:
+            return [r.model_copy(deep=True) for r in cached[1]]
         with self.session_factory() as db:
             stmt = select(ReviewRow).order_by(desc(ReviewRow.review_id))
             if run_id and issue_id:
@@ -270,6 +333,7 @@ class TriageRepository:
                     review_id=r.review_id, issue_id=r.issue_id, run_id=r.run_id, created_at=r.created_at,
                     before=before, **payload,
                 ))
+            self._reviews[key] = (now_t, [r.model_copy(deep=True) for r in out])
             return out
 
     # ---------------------------------------------------------------- evaluations & llm calls
@@ -282,15 +346,29 @@ class TriageRepository:
             else:
                 db.add(EvaluationRow(eval_id=eval_id, dataset=dataset, created_at=created_at, report_json=report_json))
             db.commit()
+        self._latest_eval[dataset] = (time.monotonic(), report_json)
 
     def get_latest_evaluation_json(self, dataset: str = "supplied") -> str | None:
+        cached = self._latest_eval.get(dataset)
+        now_t = time.monotonic()
+        if cached and (now_t - cached[0]) < _CACHE_TTL_S:
+            return cached[1]
         with self.session_factory() as db:
             stmt = select(EvaluationRow).where(EvaluationRow.dataset == dataset).order_by(desc(EvaluationRow.created_at)).limit(1)
             row = db.scalars(stmt).first()
-            return row.report_json if row else None
+            if not row:
+                return None
+            self._latest_eval[dataset] = (now_t, row.report_json)
+            return row.report_json
 
     def list_llm_calls(self, limit: int = 50) -> list[LLMCallRecord]:
+        cached = self._llm_calls.get(limit)
+        now_t = time.monotonic()
+        if cached and (now_t - cached[0]) < _CACHE_TTL_S:
+            return [c.model_copy(deep=True) for c in cached[1]]
         with self.session_factory() as db:
             rows = db.scalars(select(LLMCallRow).order_by(desc(LLMCallRow.created_at)).limit(limit)).all()
-            return [LLMCallRecord.model_validate_json(r.payload_json) for r in rows]
+            out = [LLMCallRecord.model_validate_json(r.payload_json) for r in rows]
+            self._llm_calls[limit] = (now_t, [c.model_copy(deep=True) for c in out])
+            return out
 

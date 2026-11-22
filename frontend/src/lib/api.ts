@@ -10,22 +10,62 @@ import type {
 
 export const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000").replace(/\/$/, "");
 
+const CACHE_TTL_MS = 30_000;
+const responseCache = new Map<string, { ts: number; data: unknown }>();
+const inflightCache = new Map<string, Promise<unknown>>();
+
+export function clearApiCache() {
+  responseCache.clear();
+  inflightCache.clear();
+}
+
 async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`${API_BASE}${path}`, {
-    ...init,
-    cache: "no-store",
-  });
-  if (!res.ok) {
-    let detail = `HTTP ${res.status}`;
-    try {
-      const body = await res.json();
-      if (body?.detail) detail = String(body.detail);
-    } catch {
-      // ignore parse failure
+  const method = (init?.method || "GET").toUpperCase();
+  if (method !== "GET") {
+    clearApiCache();
+  } else {
+    const cached = responseCache.get(path);
+    if (cached && Date.now() - cached.ts < CACHE_TTL_MS) {
+      return cached.data as T;
     }
-    throw new Error(detail);
+    const inflight = inflightCache.get(path);
+    if (inflight) {
+      return (await inflight) as T;
+    }
   }
-  return (await res.json()) as T;
+
+  const reqPromise = (async () => {
+    const res = await fetch(`${API_BASE}${path}`, {
+      ...init,
+      cache: "no-store",
+    });
+    if (!res.ok) {
+      let detail = `HTTP ${res.status}`;
+      try {
+        const body = await res.json();
+        if (body?.detail) detail = String(body.detail);
+      } catch {
+        // ignore parse failure
+      }
+      throw new Error(detail);
+    }
+    const data = (await res.json()) as T;
+    if (method === "GET") {
+      responseCache.set(path, { ts: Date.now(), data });
+    }
+    return data;
+  })();
+
+  if (method === "GET") {
+    inflightCache.set(path, reqPromise);
+  }
+  try {
+    return await reqPromise;
+  } finally {
+    if (method === "GET") {
+      inflightCache.delete(path);
+    }
+  }
 }
 
 export function getOverview(dataset: DatasetName): Promise<OverviewResponse> {
@@ -135,6 +175,7 @@ export async function uploadCsv(kind: "bookings" | "inbox", dataset: DatasetName
     const b = await res.json().catch(() => ({}));
     throw new Error(b.detail || `Upload failed (${res.status})`);
   }
+  clearApiCache();
   return res.json();
 }
 
