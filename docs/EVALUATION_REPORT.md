@@ -17,7 +17,7 @@ Both expected-action reference sets were frozen prior to running either workflow
 |---|---|---:|---:|---:|---:|---:|---|---|
 | `rules_v1` (English Keywords) | Evaluated | **7/8** | **0** | 8/8 | 8/8 | 8/8 | Match (`M01, M07`) | - |
 | `rules_v2` (+ Hinglish Fix) | Evaluated | **8/8** | **0** | 8/8 | 8/8 | 8/8 | Match (`M01, M07`) | - |
-| `ai_v1_raw` (`openrouter/free`) | Evaluated (`8/8` OK) | **7/8** | **0** | 8/8 | **7/8** | 8/8 | Match (`M01, M07`) | `21,712` tok / `$0.0` / `64.1s` |
+| `ai_v1_raw` (`openrouter/free`) | Evaluated (`8/8` OK) | **5/8** | **1** | 8/8 | **7/8** | 8/8 | Match (`M01, M07`) | `21,712` tok / `$0.0` / `64.1s` |
 | `ai_v1_guarded` (`openrouter/free`) | Evaluated (`8/8` OK) | **8/8** | **0** | 8/8 | **8/8** | 8/8 | Match (`M01, M07`) | `21,712` tok / `$0.0` / `64.1s` |
 
 ## Case-by-Case Comparison (Supplied Shift)

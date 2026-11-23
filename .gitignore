@@ -27,3 +27,8 @@ frontend/.next/
 frontend/out/
 *.log
 .DS_Store
+
+# Audio / Local binaries
+*.mp3
+*.wav
+
