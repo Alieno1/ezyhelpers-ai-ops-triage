@@ -25,6 +25,27 @@ This system groups the 12 messages into **8 distinct customer issues**, reconcil
 6. **Safe draft responses:** Draft-only, never auto-sent, checked for unsupported ETA/replacement/refund/quote promises.
 7. **Human approval & corrections:** Coordinator review workbench with 8 audit-logged actions and automatic priority re-ranking.
 
+## Why This Project Exists & Dashboard Insights
+
+### The Business Problem
+In home-care operations (elder companionship, childcare, cooking, and housekeeping), morning shift starts are high-stakes bottlenecks. When a single duty coordinator faces a sudden burst of WhatsApp messages, Hinglish requests, duplicate follow-ups, and disputed refund claims:
+- **Manual triage is error-prone:** Calling a routine refund query before an uncovered elder-care gap can leave a vulnerable dependant alone.
+- **Uncontrolled AI is risky:** Raw LLMs frequently hallucinate caregiver arrival ETAs, promise unapproved refunds, or ignore *"don't call, WhatsApp only"* requests.
+
+### Our Engineering Solution (Hybrid AI + Deterministic Guardrails)
+This system combines the **language understanding of LLMs** (handling English, Hindi, and Hinglish messages) with **strict deterministic Python guardrails** (`R1–R11`). The Booking Register acts as the sole source of truth—if an AI draft ever attempts an unsupported promise, the guardrail intercepts it and swaps in a pre-approved safe template automatically.
+
+### What the Coordinator Dashboard Delivers
+| Dashboard Module | Purpose & Operational Impact |
+| :--- | :--- |
+| **Overview (`/`)** | Eliminates morning decision paralysis with a **"First Callback Required"** hero banner, department workload charts, and live KPI metrics. |
+| **Priority Queue (`/queue`)** | Ranks all deduplicated tickets from `#1` to `#8` with instant `0ms` department/urgency filters and explicit Phone vs. WhatsApp channel badges. |
+| **Issue Deep-Dive (`/issues/[id]`)** | Side-by-side view comparing the customer's chronological message thread against the certified Booking Register, complete with green **Supporting Evidence** and amber **Missing Info** alerts. |
+| **Human Review (`/review`)** | Enforces **Rule R11 (Human-in-the-Loop)**—coordinators approve drafts, edit wording, or override priorities with a full timestamped audit trail. |
+| **Evaluation (`/evaluation`)** | Proves engineering rigor by benchmarking **Rules v1 (`7/8`) → Rules v2 (`8/8`) → Raw AI (`5/8`, 1 breach) → Guarded AI (`8/8`, 0 breaches)** side-by-side. |
+| **Data Quality (`/data-quality`)** | Audits raw CSV ingestion (UTF-8 BOM, missing phone numbers, ambiguous identities like `M10`) and lets operators upload new shift CSVs for instant live re-evaluation. |
+| **Exports & Model (`/exports`)** | Provides one-click Excel/CSV compliance exports and full LLM telemetry (tokens, latency, model routing, and fallback logs). |
+
 ## Technology Stack
 
 - **Frontend:** Next.js 15 (`15.5.29`), React 19, TypeScript, Tailwind CSS v4 (Light & Dark modes), Recharts, Lucide Icons
@@ -162,3 +183,12 @@ All 22 tests run against isolated temporary SQLite databases and `httpx.MockTran
 - **Free-Tier OpenRouter Variability & Daily Quota:** With hidden reasoning disabled by default (`reasoning: {"enabled": false}`) and deterministic guardrails (`guard_ai`), live execution on `openrouter/free` completed **`8/8`** supplied (`21,712` tokens, `64.1s`, `$0.00`) and **`6/6`** harder issues (`21,908` tokens, `103.0s`, `$0.00`) across free models (`nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free`, `nvidia/nemotron-3-ultra-550b-a55b:free`, `particle-ai/particle-1:free`, `nvidia/nemotron-3.5-super-vl:free`, `nvidia/nemotron-3.5-lightning:free`, `recursive/flint-v1.0:free`) with **`0`** unsupported promises. However, OpenRouter's free tier is capped at **50 requests/day** without account credits and still exhibits higher latency variability than funded endpoints; when free-tier limits or timeouts occur, `rules_fallback` preserves the complete `8/8` coordinator queue. Production deployments should pin a funded non-reasoning model such as `google/gemini-2.5-flash`.
 - **Small Evaluation Sample:** The supplied shift has 12 messages (`n=8` distinct issues), supplemented by `n=6` synthetic harder edge cases; metrics demonstrate deterministic behavior and guardrail coverage, not statistical significance.
 - **External Integration Scope:** Outgoing replies are intentionally draft-only; WhatsApp Business API sending and live CRM write-backs are out of scope for safety.
+
+---
+
+## 👤 Author
+
+**Himanshu Singh** — AI Backend Engineer, NIT Surat (SVNIT)
+
+<a href="https://linkedin.com/in/himanshu-singh-7ab162243"><img src="https://img.shields.io/badge/LinkedIn-0077B5?style=flat&logo=linkedin&logoColor=white" height="20" alt="LinkedIn" /></a>
+<a href="https://github.com/Alieno1"><img src="https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white" height="20" alt="GitHub" /></a>
