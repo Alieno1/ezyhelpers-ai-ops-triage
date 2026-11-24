@@ -88,11 +88,13 @@ class BookingFacts(BaseModel):
     arrival_confirmed: bool | None = None  # None = register says nothing
     substitute_confirmed: bool | None = None
     confirmed_start_time: str | None = None
-    refund_status: Literal["approved", "under_review", "no_record"] = "no_record"
+    refund_status: Literal["approved", "under_review", "pending", "rejected", "ambiguous", "no_record"] = "no_record"
     refund_amount: str | None = None
     payment_amount: str | None = None
     payout_date: str | None = None
     payout_date_recorded: bool = False
+    billing_ambiguous: bool = False
+    billing_ambiguity_reason: str | None = None
     sourcing_checking: bool = False
 
 

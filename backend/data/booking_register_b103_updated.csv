@@ -1,0 +1,8 @@
+booking_id,service,locality,scheduled_start_ist,updated_at_ist,operations_record,billing_record
+B101,Elder companionship,HSR Layout,2026-11-23 08:00,2026-11-22 18:10,Regular caregiver assigned. Arrival unconfirmed.,
+B102,Housekeeping,Bellandur,2026-11-23 08:15,2026-11-23 08:12,Helper assigned. Arrival pending.,
+B103,Housekeeping,JP Nagar,,2026-11-23 08:20,Booking closed.,"Original payment: ₹8,000. Refund approved: ₹3,000. Payout date: Pending."
+B104,Cooking,HSR Layout,2026-11-24 08:00,2026-11-22 18:40,08:00 start confirmed with the helper.,
+B105,Childcare,Whitefield,2026-11-23 08:30,2026-11-23 08:40,Nanny unavailable. Sourcing is checking cover. No substitute confirmed.,
+B106,Cooking,Jayanagar,,2026-11-23 08:10,Booking closed.,"₹2,000 refund approved. Payout date pending."
+

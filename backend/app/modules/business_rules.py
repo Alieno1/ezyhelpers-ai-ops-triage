@@ -114,8 +114,8 @@ def decide_action(cat: Category, s: Signals, facts: BookingFacts | None) -> Acti
         return ActionCode.ASK_MINIMUM_BOOKING_IDENTITY
     if cat == Category.REFUND_QUERY:
         f = facts or BookingFacts()
-        if f.refund_status != "approved":
-            return ActionCode.BILLING_VERIFY_DISPUTED_REFUND  # under review / no record: Billing must verify (R5, R6)
+        if f.refund_status != "approved" or f.billing_ambiguous or not f.refund_amount:
+            return ActionCode.BILLING_VERIFY_DISPUTED_REFUND  # under review / pending / rejected / ambiguous / missing amount: Billing must verify (R5, R6)
         if not f.payout_date_recorded:
             return ActionCode.RELAY_APPROVED_REFUND_CHASE_PAYOUT
         return ActionCode.RELAY_CONFIRMED_REFUND_FACTS
@@ -206,8 +206,15 @@ def missing_information(action: ActionCode, s: Signals, ctx: IssueContext) -> li
         if not s.requested_change:
             out.append("Exact requested new time (confirm with the customer)")
     elif action == ActionCode.BILLING_VERIFY_DISPUTED_REFUND:
-        out += ["Refund decision (register: under review, no approval recorded)", "Payout date (not recorded)",
-                "Who in Sales said the refund was approved (customer claim not supported by the register)" if s.refund_claimed_approved else ""]
+        if f.billing_ambiguous:
+            out += [f.billing_ambiguity_reason or "Billing record is incomplete or ambiguous (Billing confirmation required)", "Payout date (not recorded)"]
+        elif f.refund_status == "rejected":
+            out += ["Refund rejection confirmation from Billing (register: rejected)"]
+        elif f.refund_status == "pending":
+            out += ["Refund decision (register: pending, no approval recorded)", "Payout date (not recorded)"]
+        else:
+            out += ["Refund decision (register: under review, no approval recorded)", "Payout date (not recorded)",
+                    "Who in Sales said the refund was approved (customer claim not supported by the register)" if s.refund_claimed_approved else ""]
     elif action == ActionCode.RELAY_APPROVED_REFUND_CHASE_PAYOUT:
         out += ["Payout date (register: pending)"]
     elif action == ActionCode.SALES_ENQUIRY_NO_QUOTE:
@@ -231,7 +238,13 @@ def review_reasons(action: ActionCode, s: Signals, ctx: IssueContext) -> list[st
     if action == ActionCode.ASK_MINIMUM_BOOKING_IDENTITY:
         r.append("Booking identity unknown; do not link to a booking without confirmation")
     if action == ActionCode.BILLING_VERIFY_DISPUTED_REFUND:
-        r.append("Customer refund claim conflicts with the register" if s.refund_claimed_approved else "Refund not approved in the register")
+        f = ctx.booking.facts if ctx.booking else BookingFacts()
+        if f.billing_ambiguous:
+            r.append(f"Billing information is incomplete or ambiguous ({f.billing_ambiguity_reason or 'needs Billing confirmation'})")
+        elif f.refund_status == "rejected":
+            r.append("Register records the refund as rejected; confirm with Billing before replying")
+        else:
+            r.append("Customer refund claim conflicts with the register" if s.refund_claimed_approved else "Refund not approved in the register")
     if action == ActionCode.MANUAL_TRIAGE:
         r.append("Unclassified: needs a human read")
     if ctx.group.booking_match.status == "unknown_reference":

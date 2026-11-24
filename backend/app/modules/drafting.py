@@ -38,12 +38,18 @@ def template_draft(action: ActionCode, ch: Channel, s: Signals, ctx: IssueContex
                 f"Until we confirm with you, the current {cur}start time stays as booked.", None)
     if action == ActionCode.BILLING_VERIFY_DISPUTED_REFUND:
         paid = f" We can see your payment of {f.payment_amount} in our records." if f.payment_amount else ""
+        if f.billing_ambiguous:
+            return (f"Hi, thank you for following up.{paid} Our Billing team is confirming the exact refund status and details on your booking; "
+                    "we will update you here once everything is confirmed.", None)
+        if f.refund_status == "rejected":
+            return (f"Hi, thank you for following up.{paid} Our billing records do not show an approved refund for this booking. "
+                    "Our Billing team is reviewing the details and will update you here once confirmed.", None)
         return (f"Hi, thank you for following up.{paid} Your refund request is currently under review with our Billing team; "
                 "we do not yet have a decision or payout date recorded. Billing is checking it and we will update you here once there "
                 "is a confirmed decision.", None)
     if action == ActionCode.RELAY_APPROVED_REFUND_CHASE_PAYOUT:
-        amt = f"of {f.refund_amount} " if f.refund_amount else ""
-        return (f"Hi, your refund {amt}has been approved. The payout date is not confirmed yet; our Billing team is checking it and we'll "
+        amt = f"{f.refund_amount} " if f.refund_amount else ""
+        return (f"Your {amt}refund has been approved. The payout date is still pending confirmation; our Billing team is checking it and we'll "
                 "share the date here as soon as it is recorded.", None)
     if action == ActionCode.RELAY_CONFIRMED_REFUND_FACTS:
         return (f"Hi, your refund of {f.refund_amount} has been approved and the recorded payout date is {f.payout_date}.", None)
